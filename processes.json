@@ -1,0 +1,395 @@
+[
+  {
+    "pid": 5152,
+    "name": "24d004a1...exe",
+    "ppid": 4872,
+    "parent": "powershell.exe",
+    "rows": 32,
+    "user": "bachdeptrai",
+    "cmd": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+    "role": "Mẫu thực thi gốc (Root runner / Dropper)",
+    "desc": "Mẫu độc hại ban đầu được kích hoạt trực tiếp trong lab. Hành vi đầu tiên là kết nối mạng TCP cổng 80 để kiểm tra kill-switch. Khi mạng không phản hồi (thử lại 4 lần), tiến trình này lập tức rẽ nhánh sang Kịch bản B: đăng ký dịch vụ mssecsvc2.0, thả tệp C:\\Windows\\tasksche.exe và khởi chạy tiến trình cài đặt PID 6724.",
+    "impact": "Tạo kết nối mạng tới 127.0.0.1:80; đăng ký dịch vụ Windows ngầm; thả tệp thực thi vào thư mục hệ thống C:\\Windows\\.",
+    "insight": "Mắt xích khởi động toàn bộ chiến dịch tấn công. Quyết định sự phân nhánh nhị phân giữa tự hủy an toàn (Kịch bản A) hay phá hủy toàn bộ hệ thống (Kịch bản B).",
+    "flags": [
+      {
+        "flag": "[Mặc định]",
+        "meaning": "Không truyền tham số dòng lệnh; tiến trình chạy chế độ phân nhánh ban đầu."
+      }
+    ],
+    "terms": [
+      "killswitch",
+      "services"
+    ],
+    "behavior_ref": "behavior-01"
+  },
+  {
+    "pid": 5272,
+    "name": "24d004a1...exe",
+    "ppid": 644,
+    "parent": "services.exe",
+    "rows": 60,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "C:\\LabLive\\Sample_ready\\24d004a1...exe -m security",
+    "role": "Dịch vụ mssecsvc2.0 (Lan truyền mạng SMB)",
+    "desc": "Được Windows Service Control Manager (services.exe) khởi chạy tự động dưới quyền SYSTEM tối cao. Cờ \"-m security\" báo hiệu chế độ Service Worker chạy ngầm không giao diện. Mục đích chính là khởi động mô-đun quét mạng nội bộ cổng SMB 445 để khai thác lỗ hổng MS17-010 lây lan sang máy khác (bị chặn lại do card mạng bị cô lập).",
+    "impact": "Thiết lập cơ chế tự khởi động vĩnh viễn (Start = 2) trong HKLM\\SYSTEM\\CurrentControlSet\\Services\\mssecsvc2.0.",
+    "insight": "Cơ chế Persistence sống sót sau Reboot. Dù người dùng có đăng xuất hay khởi động lại máy, dịch vụ này vẫn tự động nạp lại dưới quyền SYSTEM.",
+    "flags": [
+      {
+        "flag": "-m security",
+        "meaning": "Chế độ Service Worker chạy ngầm không giao diện, kích hoạt module quét mạng SMB 445 lây lan qua MS17-010."
+      }
+    ],
+    "terms": [
+      "localsystem",
+      "services",
+      "flags_m",
+      "ms17010"
+    ],
+    "behavior_ref": "behavior-02"
+  },
+  {
+    "pid": 6724,
+    "name": "tasksche.exe",
+    "ppid": 5152,
+    "parent": "24d004a1...exe",
+    "rows": 8,
+    "user": "bachdeptrai",
+    "cmd": "C:\\WINDOWS\\tasksche.exe /i",
+    "role": "Bộ giải nén tệp độc hại (Installer)",
+    "desc": "Được PID 5152 sinh ra từ tệp dropper C:\\Windows\\tasksche.exe với tham số \"/i\" (Install). Nhiệm vụ là giải nén kho tài nguyên ZIP mã hóa trong phần .rsrc của binary vào thư mục chia sẻ C:\\ProgramData\\evmdthrukdvwcqn063\\, đồng thời đăng ký dịch vụ thứ hai để kích hoạt bộ mã hóa chính.",
+    "impact": "Tạo thư mục ngẫu nhiên trong ProgramData; giải nén toàn bộ tệp payload tống tiền (.wnry, .pky, .eky, @WanaDecryptor@.exe).",
+    "insight": "Cầu nối chuyển giao trách nhiệm từ Dropper ban đầu sang Payload tống tiền độc lập, che giấu đường dẫn tệp thực thi gốc.",
+    "flags": [
+      {
+        "flag": "/i",
+        "meaning": "Cờ Install (Cài đặt) kích hoạt giải nén kho tài nguyên mã hóa từ resource section .rsrc ra ProgramData."
+      }
+    ],
+    "terms": [
+      "tasksche_i",
+      "localsystem",
+      "services"
+    ],
+    "behavior_ref": "behavior-03"
+  },
+  {
+    "pid": 1152,
+    "name": "cmd.exe",
+    "ppid": 644,
+    "parent": "services.exe",
+    "rows": 11,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "cmd.exe /c \"C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe\"",
+    "role": "Vỏ bọc kích hoạt dịch vụ (Service Wrapper)",
+    "desc": "Sinh ra bởi services.exe để làm môi trường vỏ bọc dòng lệnh (Command Shell Wrapper) kích hoạt dịch vụ evmdthrukdvwcqn063. Chạy với tham số /c để thực thi tasksche.exe trong ProgramData dưới quyền SYSTEM.",
+    "impact": "Nâng quyền thực thi của payload lên NT AUTHORITY\\SYSTEM thông qua dịch vụ hệ thống.",
+    "insight": "Kỹ thuật Living off the Land (LotL) tận dụng cmd.exe chuẩn của Windows để làm đệm kích hoạt mã độc.",
+    "flags": [
+      {
+        "flag": "/c",
+        "meaning": "Carries out the command specified by string and then terminates (chạy lệnh xong tự thoát)."
+      }
+    ],
+    "terms": [
+      "lotl",
+      "localsystem",
+      "services"
+    ],
+    "behavior_ref": "behavior-03"
+  },
+  {
+    "pid": 3760,
+    "name": "tasksche.exe",
+    "ppid": 1152,
+    "parent": "cmd.exe",
+    "rows": 271536,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+    "role": "Bộ mã hóa cốt lõi (Core Encryptor)",
+    "desc": "Tiến trình nguy hiểm và hoạt động mạnh nhất toàn bộ chiến dịch (chiếm 271,536 trên tổng số 271,958 bản ghi Procmon). Nạp các nhà cung cấp mật mã Windows CryptoAPI (rsaenh.dll, CRYPTSP.dll), quét toàn bộ cây thư mục người dùng, mã hóa file thành .WNCRY, ghi header WANACRY! và điều phối toàn bộ các tiến trình con.",
+    "impact": "Mã hóa 100% dữ liệu mồi Decoy; tạo file thông điệp @Please_Read_Me@.txt; sinh các tiến trình con icacls, attrib, taskdl, cscript.",
+    "insight": "Trọng tâm phá hoại của ransomware. Hoạt động liên tục dưới quyền SYSTEM đảm bảo không bị gián đoạn bởi các chính sách bảo mật thông thường.",
+    "flags": [
+      {
+        "flag": "[Mặc định]",
+        "meaning": "Chạy chế độ quét toàn bộ ổ đĩa và mã hóa dữ liệu hàng loạt."
+      }
+    ],
+    "terms": [
+      "cryptoapi",
+      "file_lifecycle",
+      "wanacry_header",
+      "localsystem"
+    ],
+    "behavior_ref": "behavior-05"
+  },
+  {
+    "pid": 2064,
+    "name": "icacls.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 216,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "icacls . /grant Everyone:F /T /C /Q",
+    "role": "Phân toàn quyền thư mục (ACL Manipulation)",
+    "desc": "Được PID 3760 gọi để thao túng Access Control List (ACL) của thư mục payload hiện tại. Lệnh cấp quyền Full Control (F) đệ quy (/T) cho nhóm \"Everyone\", đảm bảo mọi tiến trình con hoặc dịch vụ chạy dưới bất kỳ tài khoản nào đều có thể đọc/ghi tệp mà không bị lỗi Access Denied.",
+    "impact": "Thay đổi Security Descriptor của thư mục ProgramData; vô hiệu hóa hàng rào kiểm soát truy cập tệp.",
+    "insight": "MITRE ATT&CK T1222.001 (File Permissions Modification) và T1490 (Inhibit System Recovery). Hành vi phòng thủ né tránh chủ động.",
+    "flags": [
+      {
+        "flag": ".",
+        "meaning": "Thư mục làm việc hiện tại (C:\\ProgramData\\evmdthrukdvwcqn063\\)."
+      },
+      {
+        "flag": "/grant Everyone:F",
+        "meaning": "Cấp đặc quyền Full Control (F) tối cao cho nhóm Everyone."
+      },
+      {
+        "flag": "/T",
+        "meaning": "Duyệt đệ quy (Traverse) áp dụng cho mọi tệp tin và thư mục con."
+      },
+      {
+        "flag": "/C",
+        "meaning": "Tiếp tục thực thi kể cả khi gặp lỗi truy cập tệp tạm."
+      },
+      {
+        "flag": "/Q",
+        "meaning": "Chế độ im lặng (Quiet), không in banner thông báo ra console."
+      }
+    ],
+    "terms": [
+      "icacls",
+      "lotl",
+      "localsystem"
+    ],
+    "behavior_ref": "behavior-04"
+  },
+  {
+    "pid": 5808,
+    "name": "attrib.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 7,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "attrib +h .",
+    "role": "Ẩn thư mục payload (Defense Evasion)",
+    "desc": "Được PID 3760 gọi để gán thuộc tính Ẩn (Hidden +h) cho thư mục hiện hành C:\\ProgramData\\evmdthrukdvwcqn063\\, che giấu sự hiện diện của thư mục chứa bộ mã hóa khỏi tầm nhìn của người dùng khi duyệt File Explorer thông thường.",
+    "impact": "Gán cờ FILE_ATTRIBUTE_HIDDEN cho thư mục làm việc của mã độc.",
+    "insight": "MITRE ATT&CK T1564.001 (Hide Artifacts). Cố gắng trì hoãn sự phát hiện và ngăn cản người dùng xóa thư mục bằng tay.",
+    "flags": [
+      {
+        "flag": "+h",
+        "meaning": "Gán thuộc tính Hidden (ẩn tệp/thư mục) trong File Allocation Table/NTFS MFT."
+      },
+      {
+        "flag": ".",
+        "meaning": "Thư mục làm việc hiện hành."
+      }
+    ],
+    "terms": [
+      "attrib",
+      "lotl"
+    ],
+    "behavior_ref": "behavior-04"
+  },
+  {
+    "pid": 3888,
+    "name": "cmd.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 20,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "cmd.exe /c 116221791435459.bat",
+    "role": "Thực thi kịch bản dọn dẹp (Script Launcher)",
+    "desc": "Môi trường đệm dòng lệnh do PID 3760 tạo ra để thực thi tập lệnh batch tạm thời mang tên ngẫu nhiên dạng số. Chịu trách nhiệm gọi cscript.exe để tạo phím tắt tống tiền trên màn hình Desktop của mọi phiên người dùng.",
+    "impact": "Khởi chạy cscript.exe thực thi script m.vbs; mở các luồng xử lý kịch bản nội bộ.",
+    "insight": "Kỹ thuật Living off the Land (LotL): Tận dụng cmd.exe có sẵn trên Windows để thực thi batch script thay vì nhúng trực tiếp chuỗi lệnh nhạy cảm vào binary mã hóa.",
+    "flags": [
+      {
+        "flag": "/c",
+        "meaning": "Carries out the command specified by string and then terminates (Thực thi lệnh trong chuỗi rồi đóng tiến trình ngay lập tức)."
+      },
+      {
+        "flag": "116221791435459.bat",
+        "meaning": "Tập lệnh batch giải nén từ payload để kích hoạt VBScript tạo shortcut Desktop."
+      }
+    ],
+    "terms": [
+      "lotl",
+      "services"
+    ],
+    "behavior_ref": "behavior-06"
+  },
+  {
+    "pid": 6096,
+    "name": "cscript.exe",
+    "ppid": 3888,
+    "parent": "cmd.exe",
+    "rows": 3,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "cscript.exe //nologo m.vbs",
+    "role": "Tạo shortcut Desktop (VBScript Runner)",
+    "desc": "Sử dụng trình thông dịch dòng lệnh Windows Script Host (cscript.exe) chạy kịch bản m.vbs với cờ //nologo nhằm triệt tiêu hoàn toàn thông tin bản quyền Microsoft trên màn hình. Kịch bản VBS này tạo tệp lối tắt @WanaDecryptor@.exe.lnk đặt thẳng lên màn hình Desktop của người dùng hiện tại.",
+    "impact": "Ghi tệp shortcut .lnk đòi tiền chuộc trực tiếp vào Desktop của người dùng.",
+    "insight": "MITRE ATT&CK T1059.005 (Command and Scripting Interpreter: Visual Basic). Đảm bảo giao diện giải mã luôn đập vào mắt nạn nhân sau mỗi lần đăng nhập lại.",
+    "flags": [
+      {
+        "flag": "//nologo",
+        "meaning": "Ngăn chặn hiển thị biểu ngữ (banner/logo) bản quyền của Windows Script Host trong console."
+      },
+      {
+        "flag": "m.vbs",
+        "meaning": "Kịch bản VBScript chứa logic gọi Shell.CreateShortcut trỏ đến @WanaDecryptor@.exe."
+      }
+    ],
+    "terms": [
+      "lotl"
+    ],
+    "behavior_ref": "behavior-06"
+  },
+  {
+    "pid": 3252,
+    "name": "taskdl.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 48,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "taskdl.exe",
+    "role": "Dọn dẹp tệp tạm thời (Temp Cleaner Instance 1)",
+    "desc": "Được PID 3760 kích hoạt định kỳ trong quá trình mã hóa để quét dọn toàn diện các tệp trung gian mang phần mở rộng .WNCRYT đã hoàn tất quá trình hoán đổi thành .WNCRY, giải phóng dung lượng đĩa và triệt tiêu dấu vết lưu tạm.",
+    "impact": "Xóa sạch các tệp tạm thời .WNCRYT trong thư mục hệ thống và hồ sơ người dùng.",
+    "insight": "Hành vi dọn dẹp hiện trường nhằm tối ưu hóa hiệu năng I/O đĩa cứng và ngăn ngừa kỹ thuật Carving phục hồi dữ liệu từ file tạm.",
+    "flags": [
+      {
+        "flag": "[Mặc định]",
+        "meaning": "Chạy không tham số; tự động duyệt đĩa tìm các tệp .WNCRYT để gọi SetDispositionInformationFile (Delete)."
+      }
+    ],
+    "terms": [
+      "file_lifecycle"
+    ],
+    "behavior_ref": "behavior-05"
+  },
+  {
+    "pid": 1532,
+    "name": "taskdl.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 24,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "taskdl.exe",
+    "role": "Dọn dẹp tệp tạm thời (Temp Cleaner Instance 2)",
+    "desc": "Đợt chạy thứ 2 của taskdl.exe tiếp tục dọn dẹp các tệp tạm sót lại khi quá trình quét đĩa mở rộng sang các phân vùng ổ đĩa và thư mục con sâu hơn.",
+    "impact": "Xóa các tệp tạm .WNCRYT còn sót lại trên phân vùng thứ cấp.",
+    "insight": "Thực thi ngầm song song với bộ mã hóa chính để đảm bảo đĩa cứng không bị đầy trong các đợt ghi tệp mã hóa hàng loạt.",
+    "flags": [
+      {
+        "flag": "[Mặc định]",
+        "meaning": "Quét dọn đợt 2 các tệp tạm .WNCRYT."
+      }
+    ],
+    "terms": [
+      "file_lifecycle"
+    ],
+    "behavior_ref": "behavior-05"
+  },
+  {
+    "pid": 6776,
+    "name": "taskdl.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 12,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "taskdl.exe",
+    "role": "Dọn dẹp tệp tạm thời (Temp Cleaner Instance 3)",
+    "desc": "Đợt chạy hoàn tất cuối cùng của taskdl.exe trước khi mã độc chính thức kích hoạt giao diện tống tiền đồ họa trên màn hình nạn nhân.",
+    "impact": "Hoàn tất việc dọn sạch tệp tạm thời trên toàn bộ các ổ đĩa.",
+    "insight": "Đánh dấu thời điểm chuyển giao kết thúc giai đoạn can thiệp file hàng loạt, chuẩn bị bung giao diện Ransom GUI.",
+    "flags": [
+      {
+        "flag": "[Mặc định]",
+        "meaning": "Quét dọn tệp tạm đợt cuối cùng trước khi bật GUI."
+      }
+    ],
+    "terms": [
+      "file_lifecycle"
+    ],
+    "behavior_ref": "behavior-05"
+  },
+  {
+    "pid": 2952,
+    "name": "Conhost.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 5,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "\\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1",
+    "role": "Cửa sổ Console hệ thống (Console Host 1)",
+    "desc": "Tiến trình chuẩn của Windows gắn liền với các công cụ dòng lệnh (attrib, icacls) được sinh ra để xử lý các luồng I/O console ở chế độ nền mà không hiển thị cửa sổ Command Prompt đen trước mắt người dùng.",
+    "impact": "Cung cấp môi trường thực thi console ngầm (Silent execution) cho các tiến trình can thiệp hệ thống.",
+    "insight": "Tiến trình OS hợp pháp bị lôi kéo theo chuỗi thực thi; phân tích điều tra cần đối chiếu cha-con để phân biệt với hoạt động quản trị thông thường.",
+    "flags": [
+      {
+        "flag": "0xffffffff",
+        "meaning": "Handle console kế thừa ngầm từ tiến trình gọi."
+      },
+      {
+        "flag": "-ForceV1",
+        "meaning": "Ép sử dụng phiên bản console v1 truyền thống của Windows Subsystem."
+      }
+    ],
+    "terms": [
+      "lotl"
+    ],
+    "behavior_ref": "behavior-04"
+  },
+  {
+    "pid": 3472,
+    "name": "Conhost.exe",
+    "ppid": 3888,
+    "parent": "cmd.exe",
+    "rows": 4,
+    "user": "NT AUTHORITY\\SYSTEM",
+    "cmd": "\\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1",
+    "role": "Cửa sổ Console hệ thống (Console Host 2)",
+    "desc": "Gắn liền với phiên thực thi của cmd.exe PID 3888 khi chạy tập lệnh batch tạo phím tắt desktop.",
+    "impact": "Cung cấp môi trường thực thi ngầm cho batch script và VBScript.",
+    "insight": "Tiến trình phụ trợ tiêu chuẩn của Windows Subsystem.",
+    "flags": [
+      {
+        "flag": "-ForceV1",
+        "meaning": "Ép sử dụng kiến trúc console v1 cho batch script."
+      }
+    ],
+    "terms": [
+      "lotl"
+    ],
+    "behavior_ref": "behavior-06"
+  },
+  {
+    "pid": 1752,
+    "name": "@WanaDecryptor@.exe",
+    "ppid": 3760,
+    "parent": "tasksche.exe",
+    "rows": 450,
+    "user": "bachdeptrai",
+    "cmd": "C:\\ProgramData\\evmdthrukdvwcqn063\\@WanaDecryptor@.exe",
+    "role": "Giao diện Đòi tiền chuộc (Ransomware GUI)",
+    "desc": "Cửa sổ đồ họa tống tiền chính thức của Wana Decrypt0r 2.0. Nạp các thư viện đồ họa MFC42, hiển thị cảnh báo đỏ rực rỡ, hai đồng hồ đếm ngược (3 ngày tăng giá gấp đôi lên 600$, 7 ngày xóa file vĩnh viễn), yêu cầu nộp 300 USD Bitcoin và thay đổi hình nền Desktop thành hình cảnh báo đen chết chóc.",
+    "impact": "Chiếm quyền điều khiển màn hình nạn nhân; ghi đè hình nền desktop; hiển thị địa chỉ ví Bitcoin tống tiền 115p7UMMngoj1pMvkpHijcRdfJNXj6LrLn.",
+    "insight": "Mục tiêu tài chính cuối cùng của chiến dịch: áp lực tâm lý thời gian thực để buộc nạn nhân thanh toán tiền chuộc giải mã.",
+    "flags": [
+      {
+        "flag": "[Mặc định]",
+        "meaning": "Chạy chế độ GUI tương tác trực tiếp với người dùng qua giao diện đồ họa Win32/MFC."
+      }
+    ],
+    "terms": [
+      "wanacry_header",
+      "cryptoapi"
+    ],
+    "behavior_ref": "behavior-06"
+  }
+]

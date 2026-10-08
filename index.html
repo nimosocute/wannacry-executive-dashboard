@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WannaCry Threat Intel & Executive Dashboard | IAM302</title>
+  <script src="dashboard_data.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -61,6 +62,9 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <button onclick="openGlossaryModal()" class="px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-xs font-semibold text-blue-400 transition inline-flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="book-marked" class="w-4 h-4 text-blue-400"></i> Tra Cứu Cơ Chế HĐH
+        </button>
         <a href="https://github.com/nimosocute/wannacry-executive-dashboard" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold text-zinc-200 transition inline-flex items-center gap-1.5 shadow-sm">
           <i data-lucide="github" class="w-4 h-4 text-white"></i> GitHub Repo
         </a>
@@ -186,189 +190,20 @@
     <section class="space-y-6" id="mechanisms">
       <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 relative overflow-hidden">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-semibold mb-2">
-          <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Kiến Trúc Thông Tin & Trải Nghiệm Học Tập
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Kiến Trúc Thông Tin & Trải Nghiệm Học Tập (Progressive Depth)
         </div>
         <h2 class="text-2xl font-extrabold tracking-tight text-white">
-          Giải Thích Cơ Chế Nguyên Nhân – Kết Quả (6 Bước Chuẩn)
+          Giải Thích Cơ Chế Nguyên Nhân – Kết Quả (6 Chuỗi Hành Vi Toàn Diện)
         </h2>
         <p class="text-xs text-zinc-400 max-w-3xl mt-1 leading-relaxed">
-          Không chỉ dừng ở câu hỏi "Kết quả là gì?", phần này giải thích sâu "Xảy ra bằng cách nào?", "Lệnh đó có tác dụng gì?", "Liên kết bước trước ra sao?" và "Bằng chứng tại chỗ chứng minh được điều gì và chưa chứng minh được điều gì?".
+          Không chỉ dừng ở câu hỏi "Kết quả là gì?", 6 hành vi dưới đây đi sâu vào: "Xảy ra bằng cách nào?", "Lệnh đó có tác dụng gì?", "Liên kết bước trước ra sao?", "Bằng chứng kép độc lập (Dual-Evidence)" và "Ranh giới kiểm toán: Chứng minh được gì & chưa chứng minh được gì?".
         </p>
       </div>
 
-      <!-- BEHAVIOR CARD 1: KILL SWITCH -->
-      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
-          <div>
-            <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">Hành Vi 01 &bull; Network Branching</span>
-            <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
-              Cơ Chế Công Tắc Hủy (Kill-Switch) & Rẽ Nhánh Thực Thi
-            </h3>
-          </div>
-          <span class="text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            HTTP 200 OK &rarr; Exit Code 0
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div class="lg:col-span-7 space-y-4 text-xs text-zinc-300">
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-amber-400 uppercase text-[10px] tracking-wider block mb-1">Bước 1 &bull; Khái niệm & Mục đích</span>
-              <p>Kill-switch là điều kiện rẽ nhánh do tác giả cài đặt vào mã độc, được nhận định ban đầu dùng như kỹ thuật <strong>Anti-Analysis / Sandbox Evasion</strong> (trong máy ảo tự động phân tích, mọi kết nối mạng đều bị chặn hoặc giả lập trả lời 200 OK, khiến mã độc nghĩ mình đang bị theo dõi nên tự tắt để giấu payload).</p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-blue-400 uppercase text-[10px] tracking-wider block mb-1">Bước 2 &bull; Logic Rẽ Nhánh Hệ Thống</span>
-              <p class="font-mono bg-zinc-950 p-2.5 rounded border border-zinc-800 text-[11px] text-zinc-200">
-                Gửi GET / tới tên miền kill-switch<br>
-                &boxur;&HorizontalLine; NẾU Có phản hồi (HTTP 200) &rarr; ExitProcess(0) trong 0.89s (Kịch bản A)<br>
-                &boxur;&HorizontalLine; NẾU Mất mạng / Lỗi kết nối &rarr; Bắt đầu chuỗi mã hóa tống tiền (Kịch bản B)
-              </p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-emerald-400 uppercase text-[10px] tracking-wider block mb-1">Bước 3 &bull; Kết luận & Giới hạn Nhận định</span>
-              <p><strong>Chứng minh được:</strong> Mã độc có sự phụ thuộc hoàn toàn vào phản hồi mạng này trước khi tiếp tục chuỗi tấn công.<br>
-              <strong>Giới hạn:</strong> Kill-switch không phải lỗ hổng Windows; việc tiến trình thoát mã 0 không chứng minh mã độc đã bị xóa khỏi đĩa cứng hay hệ thống đã an toàn tuyệt đối.</p>
-            </div>
-          </div>
-
-          <!-- Contextual Evidence Card -->
-          <div class="lg:col-span-5 space-y-2">
-            <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 group">
-              <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('screenshots/A_burp_item4_host_verified_vmware.png', 'Bằng chứng Burp Suite Item #4')">
-                <img src="screenshots/A_burp_item4_host_verified_vmware.png" alt="Burp Item 4" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" />
-                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
-                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                  Bằng chứng tại chỗ: Burp Suite Pro
-                </span>
-                <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
-                  <i data-lucide="zoom-in" class="w-4 h-4"></i>
-                </div>
-              </div>
-              <div class="p-3 bg-zinc-900/40 border-t border-zinc-800 text-[11px] text-zinc-400">
-                <strong class="text-zinc-200">Vùng quan sát:</strong> Item #4 lúc 11:44:17. Gói tin HTTP 200 OK (155 bytes) chặn đứng đợt tấn công từ PID 6520.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BEHAVIOR CARD 2: SERVICE PERSISTENCE -->
-      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
-          <div>
-            <span class="text-[10px] uppercase font-bold text-red-400 tracking-wider">Hành Vi 02 &bull; System Persistence</span>
-            <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
-              Đăng Ký Dịch Vụ Windows Ngầm (mssecsvc2.0 Quyền SYSTEM)
-            </h3>
-          </div>
-          <span class="text-xs font-mono px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-            Start Type = Auto Start (2)
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div class="lg:col-span-7 space-y-4 text-xs text-zinc-300">
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-amber-400 uppercase text-[10px] tracking-wider block mb-1">1. Quan sát & Lệnh thực thi</span>
-              <p>Mã độc tự động đăng ký dịch vụ mới tên <code>mssecsvc2.0</code> (ngụy trang <em>Microsoft Security Center (2.0) Service</em>) thực thi lệnh:<br>
-              <code class="text-amber-400 font-mono">C:\LabLive\Sample_readyd004a...exe -m security</code></p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-blue-400 uppercase text-[10px] tracking-wider block mb-1">2. Cơ chế Hệ điều hành Windows</span>
-              <p>Được ghi trực tiếp vào <code>HKLM\SYSTEM\CurrentControlSet\Services\mssecsvc2.0</code> dưới quyền <strong>LocalSystem</strong> với <code>Start = 2</code>. Cơ chế Service Manager sẽ tự động nạp tiến trình này khi máy tính vừa bật nguồn, trước khi bất kỳ người dùng nào đăng nhập.</p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-emerald-400 uppercase text-[10px] tracking-wider block mb-1">3. Kết luận & Giới hạn</span>
-              <p><strong>Chứng minh được:</strong> Khởi động lại máy tính (Reboot) không thể làm sạch mã độc; dịch vụ sẽ tự kích hoạt lại ngay lập tức.<br>
-              <strong>Giới hạn:</strong> Do lab bị cô lập card mạng vật lý, nhánh quét mạng SMB port 445 của service này không phát tán sang máy khác được.</p>
-            </div>
-          </div>
-
-          <!-- Contextual Evidence Card -->
-          <div class="lg:col-span-5 space-y-2">
-            <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 group">
-              <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('screenshots/B_service_mssecsvc_properties_vmware.png', 'Process Hacker: Thuộc tính Service mssecsvc2.0')">
-                <img src="screenshots/B_service_mssecsvc_properties_vmware.png" alt="Service Properties" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" />
-                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
-                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                  Bằng chứng: Process Hacker & Service Manager
-                </span>
-                <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
-                  <i data-lucide="zoom-in" class="w-4 h-4"></i>
-                </div>
-              </div>
-              <div class="p-3 bg-zinc-900/40 border-t border-zinc-800 text-[11px] text-zinc-400">
-                <strong class="text-zinc-200">Vùng quan sát:</strong> Binary Path chứa cờ <code>-m security</code>; Service Account: <code>LocalSystem</code>; Start Type: <code>Auto start</code>.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BEHAVIOR CARD 3: FILE ENCRYPTION PROCESS -->
-      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
-          <div>
-            <span class="text-[10px] uppercase font-bold text-red-400 tracking-wider">Hành Vi 03 &bull; File System Modification</span>
-            <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
-              Quy Trình Mã Hóa Tệp Mồi Decoys & Header Nhị Phân WANACRY!
-            </h3>
-          </div>
-          <span class="text-xs font-mono px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-            SetRenameInformationFile (.WNCRY)
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div class="lg:col-span-7 space-y-4 text-xs text-zinc-300">
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-amber-400 uppercase text-[10px] tracking-wider block mb-1">1. Phân biệt Trọng yếu (Methodology)</span>
-              <p>Cần phân biệt rõ: <strong>Quan sát thấy tệp bị đổi tên / gắn header</strong> hoàn toàn khác với <strong>Chứng minh thuật toán & quy trình sinh khóa</strong>. Qua phân tích động (Dynamic), ta xác minh được vòng đời của tệp tin; còn cấu trúc khóa AES-128 / RSA-2048 phải kiểm chứng qua các thư viện CryptoAPI được nạp (<code>rsaenh.dll</code>, <code>CRYPTSP.dll</code>).</p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-blue-400 uppercase text-[10px] tracking-wider block mb-1">2. Vòng Đời Tệp Tin (File Lifecycle)</span>
-              <p>Mã độc không ghi đè trực tiếp lên file gốc mà thực hiện 4 bước liên hoàn:<br>
-              1. Đọc nội dung tệp gốc (<code>inventory.csv</code>).<br>
-              2. Mã hóa dữ liệu trong bộ nhớ qua Windows CryptoAPI.<br>
-              3. Ghi ra tệp tạm <code>inventory.csv.WNCRYT</code> chứa header <code>WANACRY!</code>.<br>
-              4. Xóa tệp gốc và đổi tên tệp tạm thành <code>inventory.csv.WNCRY</code>.</p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
-              <span class="font-bold text-emerald-400 uppercase text-[10px] tracking-wider block mb-1">3. Kết luận Thực nghiệm</span>
-              <p>Toàn bộ 3 tệp mồi trong thư mục Decoys bị mã hóa thành công sau 12 mili-giây. Kích thước tệp tăng lên để chứa thêm metadata header khóa mã hóa.</p>
-            </div>
-          </div>
-
-          <!-- Contextual Evidence Card -->
-          <div class="lg:col-span-5 space-y-2">
-            <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 group">
-              <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('screenshots/B_procmon_rename_properties_vmware.png', 'Procmon: Sự kiện đổi tên tệp WNCRY')">
-                <img src="screenshots/B_procmon_rename_properties_vmware.png" alt="Procmon Rename Properties" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" />
-                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
-                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                  Bằng chứng: Process Monitor
-                </span>
-                <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
-                  <i data-lucide="zoom-in" class="w-4 h-4"></i>
-                </div>
-              </div>
-              <div class="p-3 bg-zinc-900/40 border-t border-zinc-800 text-[11px] text-zinc-400">
-                <strong class="text-zinc-200">Vùng quan sát:</strong> Event <code>SetRenameInformationFile</code> của PID 3760 (tasksche.exe) đổi tên từ `.WNCRYT` sang `.WNCRY`.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- DYNAMIC CONTAINER FOR ALL 6 BEHAVIORS -->
+      <div id="behaviorCardsContainer" class="space-y-6"></div>
     </section>
 
-
-    <!-- SECTION 3: PROCESS LINEAGE EXPLORER (SCENARIO B) -->
     <section id="processExplorer" class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -752,212 +587,11 @@
   </div>
 
   <script>
-    const processesData = [
-      {
-            "pid": 5152,
-            "name": "24d004a1...exe",
-            "ppid": 4872,
-            "parent": "powershell.exe",
-            "rows": 32,
-            "user": "bachdeptrai",
-            "cmd": "C:\LabLive\Sample_ready\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
-            "role": "Mẫu thực thi gốc (Root runner / Dropper)",
-            "desc": "Mẫu độc hại ban đầu được kích hoạt trực tiếp trong lab. Hành vi đầu tiên là kết nối mạng TCP cổng 80 để kiểm tra kill-switch. Khi mạng không phản hồi (thử lại 4 lần), tiến trình này lập tức rẽ nhánh sang Kịch bản B: đăng ký dịch vụ mssecsvc2.0, thả tệp C:\Windows\tasksche.exe và khởi chạy tiến trình cài đặt PID 6724.",
-            "impact": "Tạo kết nối mạng tới 127.0.0.1:80; đăng ký dịch vụ Windows ngầm; thả tệp thực thi vào thư mục hệ thống C:\Windows\.",
-            "insight": "Mắt xích khởi động toàn bộ chiến dịch tấn công. Quyết định sự phân nhánh nhị phân giữa tự hủy an toàn (Kịch bản A) hay phá hủy toàn bộ hệ thống (Kịch bản B)."
-      },
-      {
-            "pid": 5272,
-            "name": "24d004a1...exe",
-            "ppid": 644,
-            "parent": "services.exe",
-            "rows": 60,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "C:\LabLive\Sample_ready\24d004a1...exe -m security",
-            "role": "Dịch vụ mssecsvc2.0 (Lan truyền mạng SMB)",
-            "desc": "Được Windows Service Control Manager (services.exe) khởi chạy tự động dưới quyền SYSTEM tối cao. Cờ '-m security' báo hiệu chế độ Service Worker chạy ngầm không giao diện. Mục đích chính là khởi động mô-đun quét mạng nội bộ cổng SMB 445 để khai thác lỗ hổng MS17-010 lây lan sang máy khác (bị chặn lại do card mạng bị cô lập).",
-            "impact": "Thiết lập cơ chế tự khởi động vĩnh viễn (Start = 2) trong HKLM\SYSTEM\CurrentControlSet\Services\mssecsvc2.0.",
-            "insight": "Cơ chế Persistence sống sót sau Reboot. Dù người dùng có đăng xuất hay khởi động lại máy, dịch vụ này vẫn tự động nạp lại dưới quyền SYSTEM."
-      },
-      {
-            "pid": 6724,
-            "name": "tasksche.exe",
-            "ppid": 5152,
-            "parent": "24d004a1...exe",
-            "rows": 8,
-            "user": "bachdeptrai",
-            "cmd": "C:\WINDOWS\tasksche.exe /i",
-            "role": "Bộ giải nén tệp độc hại (Installer)",
-            "desc": "Được PID 5152 sinh ra từ tệp dropper C:\Windows\tasksche.exe với tham số '/i' (Install). Nhiệm vụ là giải nén kho tài nguyên ZIP mã hóa trong phần .rsrc của binary vào thư mục chia sẻ C:\ProgramData\evmdthrukdvwcqn063\, đồng thời đăng ký dịch vụ thứ hai để kích hoạt bộ mã hóa chính.",
-            "impact": "Tạo thư mục ngẫu nhiên trong ProgramData; giải nén toàn bộ tệp payload tống tiền (.wnry, .pky, .eky, @WanaDecryptor@.exe).",
-            "insight": "Cầu nối chuyển giao trách nhiệm từ Dropper ban đầu sang Payload tống tiền độc lập, che giấu đường dẫn tệp thực thi gốc."
-      },
-      {
-            "pid": 1152,
-            "name": "cmd.exe",
-            "ppid": 644,
-            "parent": "services.exe",
-            "rows": 11,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "cmd.exe /c \"C:\ProgramData\evmdthrukdvwcqn063\tasksche.exe\"",
-            "role": "Vỏ bọc kích hoạt dịch vụ (Service Wrapper)",
-            "desc": "Sinh ra bởi services.exe để làm môi trường vỏ bọc dòng lệnh (Command Shell Wrapper) kích hoạt dịch vụ evmdthrukdvwcqn063. Chạy với tham số /c để thực thi tasksche.exe trong ProgramData dưới quyền SYSTEM.",
-            "impact": "Nâng quyền thực thi của payload lên NT AUTHORITY\SYSTEM thông qua dịch vụ hệ thống.",
-            "insight": "Kỹ thuật Living off the Land (LotL) tận dụng cmd.exe chuẩn của Windows để làm đệm kích hoạt mã độc."
-      },
-      {
-            "pid": 3760,
-            "name": "tasksche.exe",
-            "ppid": 1152,
-            "parent": "cmd.exe",
-            "rows": 271536,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "C:\ProgramData\evmdthrukdvwcqn063\tasksche.exe",
-            "role": "Bộ mã hóa cốt lõi (Core Encryptor)",
-            "desc": "Tiến trình nguy hiểm và hoạt động mạnh nhất toàn bộ chiến dịch (chiếm 271,536 trên tổng số 271,958 bản ghi Procmon). Nạp các nhà cung cấp mật mã Windows CryptoAPI (rsaenh.dll, CRYPTSP.dll), quét toàn bộ cây thư mục người dùng, mã hóa file thành .WNCRY, ghi header WANACRY! và điều phối toàn bộ các tiến trình con.",
-            "impact": "Mã hóa 100% dữ liệu mồi Decoy; tạo file thông điệp @Please_Read_Me@.txt; sinh các tiến trình con icacls, attrib, taskdl, cscript.",
-            "insight": "Trọng tâm phá hoại của ransomware. Hoạt động liên tục dưới quyền SYSTEM đảm bảo không bị gián đoạn bởi các chính sách bảo mật thông thường."
-      },
-      {
-            "pid": 2064,
-            "name": "icacls.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 216,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "icacls . /grant Everyone:F /T /C /Q",
-            "role": "Phân toàn quyền thư mục (ACL Manipulation)",
-            "desc": "Được PID 3760 gọi để thao túng Access Control List (ACL) của thư mục payload hiện tại. Lệnh cấp quyền Full Control (F) đệ quy (/T) cho nhóm 'Everyone', đảm bảo mọi tiến trình con hoặc dịch vụ chạy dưới bất kỳ tài khoản nào đều có thể đọc/ghi tệp mà không bị lỗi Access Denied.",
-            "impact": "Thay đổi Security Descriptor của thư mục ProgramData; vô hiệu hóa hàng rào kiểm soát truy cập tệp.",
-            "insight": "MITRE ATT&CK T1222.001 (File Permissions Modification) và T1490 (Inhibit System Recovery). Hành vi phòng thủ né tránh chủ động."
-      },
-      {
-            "pid": 5808,
-            "name": "attrib.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 7,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "attrib +h .",
-            "role": "Ẩn thư mục payload (Defense Evasion)",
-            "desc": "Được PID 3760 gọi để gán thuộc tính Ẩn (Hidden +h) cho thư mục hiện hành C:\ProgramData\evmdthrukdvwcqn063\, che giấu sự hiện diện của thư mục chứa bộ mã hóa khỏi tầm nhìn của người dùng khi duyệt File Explorer thông thường.",
-            "impact": "Gán cờ FILE_ATTRIBUTE_HIDDEN cho thư mục làm việc của mã độc.",
-            "insight": "MITRE ATT&CK T1564.001 (Hide Artifacts). Cố gắng trì hoãn sự phát hiện và ngăn cản người dùng xóa thư mục bằng tay."
-      },
-      {
-            "pid": 3888,
-            "name": "cmd.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 20,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "cmd.exe /c 116221791435459.bat",
-            "role": "Thực thi kịch bản dọn dẹp (Script Launcher)",
-            "desc": "Môi trường đệm dòng lệnh do PID 3760 tạo ra để thực thi tập lệnh batch tạm thời. Chịu trách nhiệm gọi cscript.exe để tạo phím tắt tống tiền trên màn hình Desktop.",
-            "impact": "Khởi chạy cscript.exe thực thi script m.vbs.",
-            "insight": "Tận dụng tập lệnh batch để thực hiện các thao tác phụ trợ ngầm mà không cần nhúng trực tiếp vào mã nguồn C/C++."
-      },
-      {
-            "pid": 6096,
-            "name": "cscript.exe",
-            "ppid": 3888,
-            "parent": "cmd.exe",
-            "rows": 3,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "cscript.exe //nologo m.vbs",
-            "role": "Tạo shortcut Desktop (VBScript Runner)",
-            "desc": "Sử dụng trình thông dịch Windows Script Host (cscript.exe) chạy kịch bản m.vbs với tham số //nologo để không in banner bản quyền. Kịch bản này tạo tệp lối tắt @WanaDecryptor@.exe.lnk trực tiếp trên màn hình Desktop của người dùng.",
-            "impact": "Tạo tệp shortcut đòi tiền chuộc nổi bật trên màn hình Desktop.",
-            "insight": "MITRE ATT&CK T1059.005 (Visual Basic Script). Đảm bảo nạn nhân nhìn thấy giao diện giải mã ngay cả khi khởi động lại máy."
-      },
-      {
-            "pid": 3252,
-            "name": "taskdl.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 48,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "taskdl.exe",
-            "role": "Dọn dẹp tệp tạm thời (Temp Cleaner Instance 1)",
-            "desc": "Được PID 3760 kích hoạt định kỳ trong quá trình mã hóa để dò tìm và xóa sạch các tệp tạm đuôi .WNCRYT đã hoàn tất chuyển đổi, giải phóng không gian lưu trữ và xóa dấu vết quá trình mã hóa trung gian.",
-            "impact": "Xóa các tệp tạm thời trong thư mục hệ thống và thư mục người dùng.",
-            "insight": "Hành vi dọn dẹp hiện trường nhằm tối ưu hóa hiệu năng ghi đĩa và giảm thiểu khả năng phục hồi dữ liệu từ tệp tạm."
-      },
-      {
-            "pid": 1532,
-            "name": "taskdl.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 24,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "taskdl.exe",
-            "role": "Dọn dẹp tệp tạm thời (Temp Cleaner Instance 2)",
-            "desc": "Đợt chạy thứ 2 của taskdl.exe tiếp tục dọn dẹp các tệp tạm sót lại khi quá trình quét đĩa mở rộng sang các phân vùng ổ đĩa khác.",
-            "impact": "Xóa tệp tạm .WNCRYT.",
-            "insight": "Chạy ngầm song song với bộ mã hóa chính để đảm bảo đĩa cứng không bị đầy trong các đợt tấn công quy mô lớn."
-      },
-      {
-            "pid": 6776,
-            "name": "taskdl.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 12,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "taskdl.exe",
-            "role": "Dọn dẹp tệp tạm thời (Temp Cleaner Instance 3)",
-            "desc": "Đợt chạy hoàn tất cuối cùng của taskdl.exe trước khi mã độc kích hoạt giao diện tống tiền đồ họa.",
-            "impact": "Hoàn tất dọn dẹp tệp tạm trên toàn bộ hệ điều hành.",
-            "insight": "Đánh dấu giai đoạn kết thúc của chuỗi can thiệp hệ thống tệp tin."
-      },
-      {
-            "pid": 2952,
-            "name": "Conhost.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 5,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "\??\C:\Windows\system32\conhost.exe 0xffffffff -ForceV1",
-            "role": "Cửa sổ Console hệ thống (Console Host 1)",
-            "desc": "Tiến trình chuẩn của Windows gắn liền với các công cụ dòng lệnh (attrib, icacls) được sinh ra để xử lý các luồng I/O console ở chế độ nền không hiển thị cửa sổ đen.",
-            "impact": "Cung cấp môi trường thực thi console không hiển thị cửa sổ (Silent execution).",
-            "insight": "Tiến trình hệ điều hành hợp pháp bị lôi kéo theo chuỗi thực thi của mã độc."
-      },
-      {
-            "pid": 3472,
-            "name": "Conhost.exe",
-            "ppid": 3888,
-            "parent": "cmd.exe",
-            "rows": 4,
-            "user": "NT AUTHORITY\SYSTEM",
-            "cmd": "\??\C:\Windows\system32\conhost.exe 0xffffffff -ForceV1",
-            "role": "Cửa sổ Console hệ thống (Console Host 2)",
-            "desc": "Gắn liền với phiên thực thi của cmd.exe PID 3888 khi chạy tập lệnh batch tạo phím tắt.",
-            "impact": "Cung cấp môi trường thực thi cho batch script.",
-            "insight": "Tiến trình phụ trợ tiêu chuẩn của Windows."
-      },
-      {
-            "pid": 1752,
-            "name": "@WanaDecryptor@.exe",
-            "ppid": 3760,
-            "parent": "tasksche.exe",
-            "rows": 450,
-            "user": "bachdeptrai",
-            "cmd": "C:\ProgramData\evmdthrukdvwcqn063\@WanaDecryptor@.exe",
-            "role": "Giao diện Đòi tiền chuộc (Ransomware GUI)",
-            "desc": "Cửa sổ đồ họa tống tiền chính thức của Wana Decrypt0r 2.0. Nạp các thư viện MFC42, hiển thị cảnh báo đỏ rực, hai đồng hồ đếm ngược (3 ngày tăng giá gấp đôi lên 600$, 7 ngày xóa file vĩnh viễn), yêu cầu nộp 300 USD Bitcoin và thay đổi hình nền Desktop thành màu đen cảnh báo.",
-            "impact": "Chiếm quyền điều khiển màn hình người dùng; thay đổi hình nền desktop; hiển thị địa chỉ ví Bitcoin 115p7UMMngoj1pMvkpHijcRdfJNXj6LrLn.",
-            "insight": "Mục tiêu tài chính cuối cùng của kẻ tấn công: ép nạn nhân trả tiền chuộc để lấy khóa giải mã."
-      }
-];
-
-    const iocList = [
-      { type: 'SHA-256', val: '24D004A104D4D54034DBCFFC2A4B19A11F39008A575AA614EA04703480B1022C', note: 'Mã băm thực thi gốc của WannaCry' },
-      { type: 'Domain', val: 'www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com', note: 'Tên miền Kill-switch' },
-      { type: 'Service', val: 'mssecsvc2.0', note: 'Dịch vụ ngụy trang Microsoft Security Center' },
-      { type: 'Service', val: 'evmdthrukdvwcqn063', note: 'Dịch vụ khởi chạy bộ mã hóa tasksche' },
-      { type: 'Path', val: 'C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe', note: 'Đường dẫn bộ mã hóa tệp chính' },
-      { type: 'BTC Wallet', val: '115p7UMMngoj1pMvkpHijcRdfJNXj6LrLn', note: 'Địa chỉ ví Bitcoin đòi tiền chuộc ($300)' }
-    ];
+    const processesData = window.processesData || [];
+    const iocList = window.iocList || [];
+    const evidenceGalleryData = window.evidenceGalleryData || [];
+    const behaviorsData = window.behaviorsData || [];
+    const glossaryData = window.glossaryData || {};
 
     let currentScenario = 'A';
     let currentImg = 'screenshots/A_burp_item4_host_verified_vmware.png';
@@ -975,16 +609,18 @@
       const evidenceCaption = document.getElementById('evidenceCaption');
 
       if (sc === 'A') {
-        btnA.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-md';
-        btnB.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-zinc-400 hover:text-white';
-        flowTitle.textContent = 'Chuỗi hành vi: Kịch bản A (Có Công tắc Hủy)';
-        scenarioBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-        scenarioBadge.textContent = 'Trạng thái: An toàn tuyệt đối (0 Thiệt hại)';
+        if (btnA) btnA.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-md';
+        if (btnB) btnB.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-zinc-400 hover:text-white';
+        if (flowTitle) flowTitle.textContent = 'Chuỗi hành vi: Kịch bản A (Có Công tắc Hủy)';
+        if (scenarioBadge) {
+          scenarioBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+          scenarioBadge.textContent = 'Trạng thái: An toàn tuyệt đối (0 Thiệt hại)';
+        }
         currentImg = 'screenshots/A_burp_item4_host_verified_vmware.png';
-        evidenceImg.src = currentImg;
-        evidenceCaption.textContent = 'Burp Suite Pro: Bắt trọn vẹn yêu cầu Kill-switch HTTP 200';
+        if (evidenceImg) evidenceImg.src = currentImg;
+        if (evidenceCaption) evidenceCaption.textContent = 'Burp Suite Pro: Bắt trọn vẹn yêu cầu Kill-switch HTTP 200';
 
-        timelineContainer.innerHTML = `
+        if (timelineContainer) timelineContainer.innerHTML = `
           <div class="flex gap-3 items-start">
             <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
             <div>
@@ -1008,7 +644,7 @@
           </div>
         `;
 
-        statsList.innerHTML = `
+        if (statsList) statsList.innerHTML = `
           <div class="flex justify-between py-1.5 border-b border-zinc-800">
             <span class="text-zinc-400">Thời gian sống</span>
             <span class="font-bold text-emerald-400">0.8922 giây</span>
@@ -1027,7 +663,7 @@
           </div>
         `;
 
-        decoyList.innerHTML = `
+        if (decoyList) decoyList.innerHTML = `
           <div class="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
             <span class="text-zinc-300 font-mono">inventory.csv</span>
             <span class="text-emerald-400 font-bold">Nguyên vẹn</span>
@@ -1042,16 +678,18 @@
           </div>
         `;
       } else {
-        btnB.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-red-600 text-white shadow-md';
-        btnA.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-zinc-400 hover:text-white';
-        flowTitle.textContent = 'Chuỗi hành vi: Kịch bản B (Mất mạng & Tấn công toàn diện)';
-        scenarioBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20';
-        scenarioBadge.textContent = 'Trạng thái: Bị tê liệt & Tống tiền 300$';
+        if (btnB) btnB.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-red-600 text-white shadow-md';
+        if (btnA) btnA.className = 'px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-zinc-400 hover:text-white';
+        if (flowTitle) flowTitle.textContent = 'Chuỗi hành vi: Kịch bản B (Mất mạng & Tấn công toàn diện)';
+        if (scenarioBadge) {
+          scenarioBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20';
+          scenarioBadge.textContent = 'Trạng thái: Bị tê liệt & Tống tiền 300$';
+        }
         currentImg = 'screenshots/B_ransom_gui_final_identity_vmware.png';
-        evidenceImg.src = currentImg;
-        evidenceCaption.textContent = 'Wana Decrypt0r 2.0: Màn hình đòi tiền chuộc đếm ngược 3 ngày / 7 ngày';
+        if (evidenceImg) evidenceImg.src = currentImg;
+        if (evidenceCaption) evidenceCaption.textContent = 'Wana Decrypt0r 2.0: Màn hình đòi tiền chuộc đếm ngược 3 ngày / 7 ngày';
 
-        timelineContainer.innerHTML = `
+        if (timelineContainer) timelineContainer.innerHTML = `
           <div class="flex gap-3 items-start">
             <div class="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
             <div>
@@ -1082,7 +720,7 @@
           </div>
         `;
 
-        statsList.innerHTML = `
+        if (statsList) statsList.innerHTML = `
           <div class="flex justify-between py-1.5 border-b border-zinc-800">
             <span class="text-zinc-400">Tổng tiến trình độc hại</span>
             <span class="font-bold text-red-400">15 PIDs</span>
@@ -1101,7 +739,7 @@
           </div>
         `;
 
-        decoyList.innerHTML = `
+        if (decoyList) decoyList.innerHTML = `
           <div class="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
             <span class="text-zinc-300 font-mono">inventory.csv.WNCRY</span>
             <span class="text-red-400 font-bold">Đã mã hóa (WANACRY!)</span>
@@ -1121,8 +759,9 @@
 
     function renderProcesses() {
       const list = document.getElementById('processList');
+      if (!list) return;
       list.innerHTML = processesData.map((p, idx) => `
-        <div onclick="selectProcess(${idx})" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/80 cursor-pointer transition flex items-center justify-between">
+        <div onclick="selectProcess(${idx})" id="procItem_${idx}" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/80 cursor-pointer transition flex items-center justify-between">
           <div>
             <div class="font-mono text-xs font-bold text-white flex items-center gap-1.5">
               <span class="text-zinc-400 text-[10px]">PID:</span> ${p.pid}
@@ -1133,12 +772,38 @@
           <span class="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono">${p.rows.toLocaleString()} rows</span>
         </div>
       `).join('');
-      selectProcess(4);
+      selectProcess(2); // Focus on PID 6724 tasksche.exe to immediately answer user question
     }
 
     function selectProcess(idx) {
       const p = processesData[idx];
       const detail = document.getElementById('processDetail');
+      if (!p || !detail) return;
+
+      processesData.forEach((_, i) => {
+        const item = document.getElementById(`procItem_${i}`);
+        if (item) {
+          if (i === idx) {
+            item.className = "p-3 rounded-xl border border-amber-500/50 bg-amber-500/10 cursor-pointer transition flex items-center justify-between";
+          } else {
+            item.className = "p-3 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/80 cursor-pointer transition flex items-center justify-between";
+          }
+        }
+      });
+
+      const flagsHtml = (p.flags || []).map(f => `
+        <div class="p-2 rounded-lg bg-zinc-950 border border-zinc-800/80">
+          <span class="font-mono text-xs font-bold text-amber-400 block">${f.flag}</span>
+          <span class="text-[11px] text-zinc-300 block mt-0.5 leading-relaxed">${f.meaning}</span>
+        </div>
+      `).join('');
+
+      const termsHtml = (p.terms || []).map(t => `
+        <button onclick="openGlossaryModal('${t}')" class="px-2 py-0.5 rounded-md bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 text-[11px] font-mono transition-colors">
+          #${t}
+        </button>
+      `).join('');
+
       detail.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
           <div>
@@ -1197,49 +862,309 @@
           <p class="text-xs text-zinc-300 leading-relaxed">${p.insight}</p>
         </div>
 
-        <!-- 4. COMMAND LINE -->
-        <div>
+        <!-- 4. COMMAND LINE & FLAG BREAKDOWN -->
+        <div class="space-y-2">
           <span class="text-zinc-400 text-xs font-semibold flex items-center gap-1.5">
             <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Lệnh thực thi (Command Line):
           </span>
-          <pre class="mt-1 p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 overflow-x-auto whitespace-pre-wrap font-mono">${p.cmd}</pre>
+          <pre class="p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 overflow-x-auto whitespace-pre-wrap font-mono">${p.cmd}</pre>
+          ${flagsHtml ? `
+            <div class="pt-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-1.5">Giải Nghĩa Tham Số & Cờ Lệnh (Flag Breakdown):</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                ${flagsHtml}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- 5. OS GLOSSARY & JUMP TO BEHAVIOR -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-zinc-800/80">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mr-1">Thuật ngữ HĐH liên quan:</span>
+            ${termsHtml}
+          </div>
+          ${p.behavior_ref ? `
+            <button onclick="jumpToBehavior('${p.behavior_ref}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all self-start sm:self-auto">
+              <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i> Xem Phân Tích Hành Vi ${p.behavior_ref.toUpperCase()}
+            </button>
+          ` : ''}
         </div>
       `;
       lucide.createIcons();
     }
-            </h4>
+
+    function jumpToBehavior(behaviorId) {
+      const el = document.getElementById(behaviorId);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.classList.add('ring-2', 'ring-amber-400', 'bg-amber-500/5');
+      setTimeout(() => {
+        el.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-500/5');
+      }, 2500);
+    }
+
+    function renderBehaviors() {
+      const container = document.getElementById('behaviorCardsContainer');
+      if (!container || !behaviorsData) return;
+
+      container.innerHTML = behaviorsData.map((b) => {
+        const termsHtml = (b.terms || []).map(t => `
+          <button onclick="openGlossaryModal('${t}')" class="px-2 py-0.5 rounded-md bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 text-[11px] font-mono transition-colors">
+            #${t}
+          </button>
+        `).join('');
+
+        const paramsHtml = b.step2_params && b.step2_params.items ? b.step2_params.items.map(p => `
+          <div class="p-2.5 rounded-lg bg-zinc-950/60 border border-zinc-800/80">
+            <span class="font-mono text-xs font-bold text-amber-400 block">${p.term}</span>
+            <span class="text-[11px] text-zinc-300 mt-0.5 block leading-relaxed">${p.desc}</span>
           </div>
-          <span class="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
-            ${p.role}
-          </span>
+        `).join('') : '';
+
+        const provenHtml = (b.boundary_proven || []).map(item => `
+          <li class="flex items-start gap-2 text-xs text-emerald-300">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+            <span>${item}</span>
+          </li>
+        `).join('');
+
+        const limitHtml = (b.boundary_limit || []).map(item => `
+          <li class="flex items-start gap-2 text-xs text-amber-300">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+            <span>${item}</span>
+          </li>
+        `).join('');
+
+        return `
+          <div id="${b.id}" class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6 transition-all duration-300">
+            <!-- HEADER -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">${b.num} &bull; ${b.cat}</span>
+                </div>
+                <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
+                  ${b.title}
+                </h3>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-mono px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                  ${b.badge}
+                </span>
+                ${termsHtml}
+              </div>
+            </div>
+
+            <!-- 6-STEP CAUSAL PROGRESSION -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- LEFT COLUMN: CONCEPT, PARAMS, OS & CAUSALITY -->
+              <div class="space-y-4">
+                <!-- STEP 1: CONCEPT -->
+                <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-1.5">
+                  <span class="text-[10px] uppercase font-bold text-blue-400 tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> Bước 1 &bull; Khái Niệm & Quan Sát
+                  </span>
+                  <p class="text-xs text-zinc-300 leading-relaxed">${b.step1_concept}</p>
+                </div>
+
+                <!-- STEP 2: PARAMS & SEMANTICS -->
+                <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-2">
+                  <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="code" class="w-3.5 h-3.5"></i> Bước 2 &bull; Giải Nghĩa Tham Số & Cấu Trúc (${b.step2_params ? b.step2_params.title : ''})
+                  </span>
+                  <div class="grid grid-cols-1 gap-2">
+                    ${paramsHtml}
+                  </div>
+                </div>
+
+                <!-- STEP 3: OS MECHANISM -->
+                <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-1.5">
+                  <span class="text-[10px] uppercase font-bold text-purple-400 tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Bước 3 &bull; Cơ Chế Hệ Điều Hành Xử Lý
+                  </span>
+                  <p class="text-xs text-zinc-300 leading-relaxed">${b.step3_os}</p>
+                </div>
+
+                <!-- STEP 4: CAUSALITY & BRANCHING -->
+                <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-2">
+                  <span class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Bước 4 &bull; Quan Hệ Nhân - Quả & Luồng Rẽ Nhánh
+                  </span>
+                  <p class="text-xs text-zinc-300 leading-relaxed">${b.step4_cause.flow_desc}</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono mt-2">
+                    <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                      <span class="font-bold block text-[10px] uppercase text-emerald-400">Nhánh Rẽ A:</span>
+                      ${b.step4_cause.branch_true}
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300">
+                      <span class="font-bold block text-[10px] uppercase text-red-400">Nhánh Rẽ B:</span>
+                      ${b.step4_cause.branch_false}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT COLUMN: DUAL EVIDENCE & BOUNDARY AUDIT -->
+              <div class="space-y-4">
+                <!-- STEP 5: DUAL EVIDENCE SWITCHER -->
+                <div class="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+                  <div class="flex items-center justify-between flex-wrap gap-2">
+                    <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider flex items-center gap-1.5">
+                      <i data-lucide="camera" class="w-3.5 h-3.5"></i> Bước 5 &bull; Bằng Chứng Kép Tại Chỗ (Dual-Evidence)
+                    </span>
+                    <div class="inline-flex rounded-lg bg-zinc-950 p-1 border border-zinc-800 text-[11px]">
+                      <button id="btn_${b.id}_evA" onclick="switchEvidence('${b.id}', 'A')" class="px-2.5 py-1 rounded font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all">
+                        Nguồn A (${b.evidence_a.tool})
+                      </button>
+                      <button id="btn_${b.id}_evB" onclick="switchEvidence('${b.id}', 'B')" class="px-2.5 py-1 rounded font-medium text-zinc-400 hover:text-zinc-200 transition-all">
+                        Nguồn B (${b.evidence_b.tool})
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- EVIDENCE CONTENT CONTAINER -->
+                  <div id="container_${b.id}_evidence" class="space-y-3"></div>
+                </div>
+
+                <!-- STEP 6: BOUNDARY AUDIT (PROVEN VS LIMITS) -->
+                <div class="grid grid-cols-1 gap-3">
+                  <!-- PROVEN -->
+                  <div class="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-900/40 space-y-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Chứng Minh Được (Audit Proven)
+                    </span>
+                    <ul class="space-y-1.5">
+                      ${provenHtml}
+                    </ul>
+                  </div>
+
+                  <!-- LIMITATIONS -->
+                  <div class="p-3.5 rounded-xl bg-amber-950/20 border border-amber-900/40 space-y-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                      <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Giới Hạn & Chưa Chứng Minh Được (Boundaries)
+                    </span>
+                    <ul class="space-y-1.5">
+                      ${limitHtml}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      behaviorsData.forEach(b => switchEvidence(b.id, 'A'));
+      lucide.createIcons();
+    }
+
+    function switchEvidence(bId, which) {
+      const b = behaviorsData.find(x => x.id === bId);
+      if (!b) return;
+      const ev = which === 'A' ? b.evidence_a : b.evidence_b;
+      const otherWhich = which === 'A' ? 'B' : 'A';
+
+      const btnActive = document.getElementById(`btn_${bId}_ev${which}`);
+      const btnInactive = document.getElementById(`btn_${bId}_ev${otherWhich}`);
+      if (btnActive && btnInactive) {
+        btnActive.className = "px-2.5 py-1 rounded font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all";
+        btnInactive.className = "px-2.5 py-1 rounded font-medium text-zinc-400 hover:text-zinc-200 transition-all";
+      }
+
+      const container = document.getElementById(`container_${bId}_evidence`);
+      if (!container) return;
+
+      const breakdownHtml = (ev.breakdown || []).map(item => `
+        <div class="flex items-center justify-between text-[11px] py-1 border-b border-zinc-800/60 last:border-0">
+          <span class="text-zinc-400">${item.field}:</span>
+          <span class="font-mono text-zinc-200 font-semibold">${item.val}</span>
         </div>
-        <div class="grid grid-cols-2 gap-4 text-xs">
-          <div>
-            <span class="text-zinc-400">Tiến trình cha (PPID):</span>
-            <p class="font-mono text-zinc-200 mt-0.5">${p.ppid} (${p.parent})</p>
-          </div>
-          <div>
-            <span class="text-zinc-400">Ngữ cảnh tài khoản:</span>
-            <p class="font-mono text-zinc-200 mt-0.5">${p.user}</p>
-          </div>
-          <div>
-            <span class="text-zinc-400">Số bản ghi Procmon:</span>
-            <p class="font-mono text-emerald-400 font-bold mt-0.5">${p.rows.toLocaleString()} bản ghi</p>
-          </div>
-          <div>
-            <span class="text-zinc-400">Trạng thái:</span>
-            <p class="text-red-400 font-medium mt-0.5">Xác minh thực nghiệm</p>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="group relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 cursor-pointer" onclick="openModalWithSrc('${ev.file}', '${ev.title.replace(/'/g, "\\'")}')">
+          <img src="${ev.file}" alt="${ev.title}" class="w-full h-56 object-cover object-top group-hover:scale-105 transition-transform duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
+          <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs">
+            <span class="font-semibold text-white truncate">${ev.title}</span>
+            <span class="px-2 py-0.5 rounded bg-zinc-900/90 text-[10px] text-amber-400 border border-zinc-700 shrink-0">Phóng to</span>
           </div>
         </div>
-        <div>
-          <span class="text-zinc-400 text-xs">Lệnh thực thi (Command Line):</span>
-          <pre class="mt-1 p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 overflow-x-auto whitespace-pre-wrap">${p.cmd}</pre>
+        <div class="p-3 rounded-lg bg-zinc-950/70 border border-zinc-800/80 space-y-2">
+          <p class="text-xs text-zinc-300 leading-relaxed">${ev.caption}</p>
+          <div class="pt-2 border-t border-zinc-800/60">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-1">Các Trường Dữ Liệu Quan Sát:</span>
+            <div class="space-y-0.5">
+              ${breakdownHtml}
+            </div>
+          </div>
         </div>
       `;
+      lucide.createIcons();
+    }
+
+    function openGlossaryModal(termKey) {
+      const modal = document.getElementById('glossaryModal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      renderGlossaryTerms(termKey);
+      lucide.createIcons();
+    }
+
+    function closeGlossaryModal() {
+      const modal = document.getElementById('glossaryModal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+    }
+
+    function renderGlossaryTerms(activeKey) {
+      const listContainer = document.getElementById('glossaryListContainer');
+      if (!listContainer || !glossaryData) return;
+
+      const searchInput = document.getElementById('glossarySearchInput');
+      const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      const entries = Object.entries(glossaryData);
+      const filtered = entries.filter(([key, item]) => {
+        if (activeKey && key === activeKey) return true;
+        if (!query) return true;
+        return key.toLowerCase().includes(query) ||
+               item.title.toLowerCase().includes(query) ||
+               item.def.toLowerCase().includes(query) ||
+               item.abuse.toLowerCase().includes(query);
+      });
+
+      listContainer.innerHTML = filtered.map(([key, item]) => {
+        const isTarget = activeKey === key;
+        return `
+          <div id="term_${key}" class="p-4 rounded-xl border ${isTarget ? 'border-amber-500 bg-amber-500/10' : 'border-zinc-800 bg-zinc-900/60'} space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="text-sm font-bold font-mono ${isTarget ? 'text-amber-400' : 'text-white'} flex items-center gap-2">
+                <span>${item.title}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 font-sans border border-zinc-700 font-normal">${item.cat}</span>
+              </h4>
+              <span class="text-[10px] font-mono text-zinc-500">#${key}</span>
+            </div>
+            <p class="text-xs text-zinc-300 leading-relaxed"><strong class="text-zinc-200">Định nghĩa:</strong> ${item.def}</p>
+            <p class="text-xs text-zinc-400 leading-relaxed"><strong class="text-zinc-300">Cơ chế HĐH:</strong> ${item.mech}</p>
+            <p class="text-xs text-amber-300/90 leading-relaxed"><strong class="text-amber-400">Cách mã độc lạm dụng:</strong> ${item.abuse}</p>
+            <p class="text-xs text-emerald-300/90 leading-relaxed"><strong class="text-emerald-400">Dấu hiệu giám sát & phòng thủ:</strong> ${item.defense}</p>
+          </div>
+        `;
+      }).join('');
+
+      if (activeKey) {
+        const targetEl = document.getElementById(`term_${activeKey}`);
+        if (targetEl) {
+          setTimeout(() => targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        }
+      }
     }
 
     function renderIocs() {
       const tbody = document.getElementById('iocTableBody');
+      if (!tbody) return;
       tbody.innerHTML = iocList.map(ioc => `
         <tr class="hover:bg-zinc-900/50 transition">
           <td class="py-3 px-4 font-semibold text-zinc-300">${ioc.type}</td>
@@ -1252,6 +1177,7 @@
           </td>
         </tr>
       `).join('');
+      lucide.createIcons();
     }
 
     function copyText(txt) {
@@ -1263,6 +1189,7 @@
       const modal = document.getElementById('imgModal');
       const img = document.getElementById('modalImg');
       const title = document.getElementById('modalTitle');
+      if (!modal || !img || !title) return;
       img.src = currentImg;
       title.textContent = 'Bằng chứng thực nghiệm: ' + currentImg;
       modal.classList.remove('hidden');
@@ -1270,142 +1197,14 @@
     }
 
     function closeModal() {
-      document.getElementById('imgModal').classList.add('hidden');
+      const modal = document.getElementById('imgModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function scrollToSection(id) {
-      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
-
-    
-    const evidenceGalleryData = [
-  {
-    "id": "ev_procmon_1",
-    "tool": "Process Monitor",
-    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    "tool_code": "procmon",
-    "title": "Cây tiến trình Procmon mở rộng (15 Nhánh)",
-    "desc": "Xác minh toàn bộ quan hệ cha - con (PPID - PID) của 15 tiến trình độc hại chạy dưới quyền SYSTEM.",
-    "file": "screenshots/B_procmon_tree_expanded_vmware.png"
-  },
-  {
-    "id": "ev_procmon_2",
-    "tool": "Process Monitor",
-    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    "tool_code": "procmon",
-    "title": "Tiến trình mã hóa cốt lõi (PID 3760 SYSTEM)",
-    "desc": "Bản ghi Procmon xác minh tasksche.exe thực thi độc quyền dưới tài khoản NT AUTHORITY\\SYSTEM.",
-    "file": "screenshots/B_procmon_event_process_identity_vmware.png"
-  },
-  {
-    "id": "ev_procmon_3",
-    "tool": "Process Monitor",
-    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    "tool_code": "procmon",
-    "title": "Nhật ký can thiệp tệp Decoy trong Lab",
-    "desc": "Procmon ghi nhận chuỗi sự kiện CreateFile, WriteFile, SetRenameInformationFile trên thư mục Decoys.",
-    "file": "screenshots/B_procmon_decoy_events_vmware.png"
-  },
-  {
-    "id": "ev_procmon_4",
-    "tool": "Process Monitor",
-    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    "tool_code": "procmon",
-    "title": "Thuộc tính sự kiện đổi tên sang đuôi .WNCRY",
-    "desc": "Bản ghi chi tiết thao tác đổi tên từ inventory.csv.WNCRYT thành inventory.csv.WNCRY.",
-    "file": "screenshots/B_procmon_rename_properties_vmware.png"
-  },
-  {
-    "id": "ev_procmon_5",
-    "tool": "Process Monitor",
-    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    "tool_code": "procmon",
-    "title": "Kịch bản A: Thoát sạch mã 0 trong 0.89 giây",
-    "desc": "Procmon xác minh PID 6520 tự kết thúc sạch sẽ sau khi nhận HTTP 200 OK từ Burp Suite.",
-    "file": "screenshots/A_run_direct_launch_1143_vmware.png"
-  },
-  {
-    "id": "ev_ph_1",
-    "tool": "Process Hacker",
-    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    "tool_code": "processhacker",
-    "title": "Dịch vụ ngầm mssecsvc2.0 đang chạy",
-    "desc": "Process Hacker Services tab hiển thị dịch vụ độc hại ngụy trang với trạng thái Running và Start type Auto.",
-    "file": "screenshots/B_service_mssecsvc_selected_vmware.png"
-  },
-  {
-    "id": "ev_ph_2",
-    "tool": "Process Hacker",
-    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    "tool_code": "processhacker",
-    "title": "Thuộc tính dịch vụ mssecsvc2.0 (LocalSystem)",
-    "desc": "Xác nhận đường dẫn binary chứa cờ -m security và tài khoản thực thi LocalSystem duy trì persistence.",
-    "file": "screenshots/B_service_mssecsvc_properties_vmware.png"
-  },
-  {
-    "id": "ev_ph_3",
-    "tool": "Process Hacker",
-    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    "tool_code": "processhacker",
-    "title": "Danh sách Named Handles của tasksche.exe",
-    "desc": "Process Hacker liệt kê toàn bộ Mutant MsWinZonesCacheCounterMutexA, Mutex và File handles đang mở.",
-    "file": "screenshots/B_processhacker_tasksche_handles_vmware.png"
-  },
-  {
-    "id": "ev_ph_4",
-    "tool": "Process Hacker",
-    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    "tool_code": "processhacker",
-    "title": "Danh mục Loaded Modules DLLs của tasksche.exe",
-    "desc": "Xác minh các thư viện mật mã nạp vào bộ nhớ: CRYPTSP.dll, rsaenh.dll, CRYPTBASE.dll, bcryptPrimitives.dll.",
-    "file": "screenshots/B_processhacker_tasksche_modules_vmware.png"
-  },
-  {
-    "id": "ev_ph_5",
-    "tool": "Process Hacker",
-    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    "tool_code": "processhacker",
-    "title": "Tổng quan tiến trình Process Hacker Host Verified",
-    "desc": "Giao diện Process Hacker toàn màn hình giám sát toàn bộ các tiến trình độc hại trong VM.",
-    "file": "screenshots/B_processhacker_host_verified_vmware.png"
-  },
-  {
-    "id": "ev_burp_1",
-    "tool": "Burp Suite Pro",
-    "tool_badge": "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    "tool_code": "burpsuite",
-    "title": "Burp Item #4: Bắt gói tin Kill-switch HTTP 200",
-    "desc": "Toàn văn HTTP Request GET / và HTTP Response 200 OK giả lập môi trường chặn đứng đợt tấn công.",
-    "file": "screenshots/A_burp_item4_host_verified_vmware.png"
-  },
-  {
-    "id": "ev_explorer_1",
-    "tool": "Explorer & Desktop",
-    "tool_badge": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    "tool_code": "explorer",
-    "title": "Thư mục Decoys bị mã hóa & Đổi hình nền",
-    "desc": "Windows Explorer hiển thị 3 tệp mồi bị đổi đuôi .WNCRY kèm văn bản tống tiền và hình nền desktop chuyển sang màu đen.",
-    "file": "screenshots/B_decoys_encrypted_host_verified_vmware.png"
-  },
-  {
-    "id": "ev_ransom_1",
-    "tool": "Ransomware GUI",
-    "tool_badge": "bg-red-500/10 text-red-400 border-red-500/20",
-    "tool_code": "ransomgui",
-    "title": "Giao diện Wana Decrypt0r 2.0 (Định danh Sinh viên)",
-    "desc": "Cửa sổ tống tiền đòi 300$ Bitcoin, đồng hồ đếm ngược 3 ngày/7 ngày kèm nhãn chứng minh sinh viên Nguyen Van Bach.",
-    "file": "screenshots/B_ransom_gui_final_identity_vmware.png"
-  },
-  {
-    "id": "ev_ransom_2",
-    "tool": "Ransomware GUI",
-    "tool_badge": "bg-red-500/10 text-red-400 border-red-500/20",
-    "tool_code": "ransomgui",
-    "title": "Giao diện Wana Decrypt0r 2.0 trực tiếp trên VM",
-    "desc": "Chụp toàn màn hình máy ảo Windows 10 chứng minh ransomware chiếm quyền điều khiển Desktop hoàn toàn.",
-    "file": "screenshots/B_wanadecryptor_host_live_vmware.png"
-  }
-];
 
     function renderGallery(filter = 'all') {
       const grid = document.getElementById('galleryGrid');
@@ -1413,7 +1212,7 @@
       const filtered = filter === 'all' ? evidenceGalleryData : evidenceGalleryData.filter(item => item.tool_code === filter);
       grid.innerHTML = filtered.map(item => `
         <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 hover:border-zinc-700 transition flex flex-col group shadow-lg">
-          <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('${item.file}', '${item.title}')">
+          <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('${item.file}', '${item.title.replace(/'/g, "\\'")}')">
             <img src="${item.file}" alt="${item.title}" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300 opacity-90 group-hover:opacity-100" />
             <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
             <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.tool_badge}">
@@ -1428,7 +1227,7 @@
               <h4 class="text-sm font-bold text-white group-hover:text-blue-400 transition leading-snug">${item.title}</h4>
               <p class="text-xs text-zinc-400 mt-1 leading-relaxed">${item.desc}</p>
             </div>
-            <button onclick="openModalWithSrc('${item.file}', '${item.title}')" class="w-full py-1.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+            <button onclick="openModalWithSrc('${item.file}', '${item.title.replace(/'/g, "\\'")}')" class="w-full py-1.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold transition flex items-center justify-center gap-1.5">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> Phóng to xem bằng chứng
             </button>
           </div>
@@ -1456,6 +1255,7 @@
       const modal = document.getElementById('imgModal');
       const img = document.getElementById('modalImg');
       const titleEl = document.getElementById('modalTitle');
+      if (!modal || !img || !titleEl) return;
       img.src = src;
       titleEl.textContent = title;
       modal.classList.remove('hidden');
@@ -1463,10 +1263,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      renderGallery('all');
-      setScenario('A');
+      renderBehaviors();
       renderProcesses();
+      setScenario('A');
       renderIocs();
+      renderGallery('all');
       lucide.createIcons();
     });
   </script>

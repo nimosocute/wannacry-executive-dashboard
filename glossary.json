@@ -1,0 +1,98 @@
+{
+  "localsystem": {
+    "title": "NT AUTHORITY\\SYSTEM (LocalSystem)",
+    "cat": "Windows Security Context",
+    "def": "Tài khoản dịch vụ đặc quyền tối cao trong Windows NT, vượt trên cả tài khoản Administrator cục bộ.",
+    "mech": "Được hệ điều hành nạp sẵn khi khởi động nhân Windows. Tiến trình chạy dưới quyền SYSTEM có toàn quyền can thiệp vào kernel, registry (HKLM), nạp driver thiết bị, và bỏ qua mọi rào cản phân quyền User Account Control (UAC).",
+    "abuse": "WannaCry đăng ký dịch vụ mssecsvc2.0 và evmdthrukdvwcqn063 chạy dưới quyền SYSTEM. Điều này giúp bộ mã hóa tasksche.exe có thể can thiệp, đổi tên và mã hóa tệp tin trên toàn hệ thống mà không bao giờ bị báo lỗi Access Denied.",
+    "defense": "Giám sát chặt chẽ Event ID 7045 (A new service was installed) và các tiến trình con được sinh ra bất thường từ services.exe hoặc cmd.exe mang token SYSTEM."
+  },
+  "services": {
+    "title": "services.exe (Service Control Manager - SCM)",
+    "cat": "Windows OS Core Subsystem",
+    "def": "Tiến trình hệ thống cốt lõi quản lý toàn bộ vòng đời của các dịch vụ Windows (Windows Services).",
+    "mech": "SCM duy trì cơ sở dữ liệu các dịch vụ tại HKLM\\SYSTEM\\CurrentControlSet\\Services. SCM là tiến trình cha (PPID 644) duy nhất có thẩm quyền khởi tạo, tạm dừng và giám sát trạng thái chạy ngầm của các dịch vụ Windows.",
+    "abuse": "Mã độc gọi API CreateServiceA/W để thêm dịch vụ mới, sau đó yêu cầu SCM khởi động dịch vụ. Bằng cách này, mã độc ngụy trang hoàn hảo thành một tiến trình con hợp pháp của services.exe.",
+    "defense": "Cấu hình cảnh báo SIEM/EDR khi có dịch vụ mới đăng ký đường dẫn thực thi nằm ngoài C:\\Windows\\System32\\ (ví dụ trỏ vào C:\\ProgramData\\ hoặc thư mục tạm)."
+  },
+  "flags_m": {
+    "title": "Tham số cờ \"-m security\"",
+    "cat": "Malware Internal CLI",
+    "def": "Cờ dòng lệnh nội bộ độc quyền của WannaCry truyền vào binary ban đầu khi chạy dưới dạng service.",
+    "mech": "Khi SCM thực thi Service Binary Path \"C:\\...\\sample.exe -m security\", hàm main() của mã độc đọc argc/argv. Cờ \"-m\" là viết tắt của \"mode\", giá trị \"security\" chỉ thị mã độc chạy ở chế độ Service Worker.",
+    "abuse": "Kích hoạt mô-đun Service Worker chạy ngầm không hiển thị cửa sổ console hay GUI, lập tức tạo luồng kết nối cổng SMB TCP 445 để quét mạng nội bộ lây lan sang các máy tính khác qua lỗ hổng MS17-010.",
+    "defense": "Nhận diện chữ ký dòng lệnh chứa \"-m security\" để cách ly tiến trình tức thì trên EDR."
+  },
+  "tasksche_i": {
+    "title": "Tham số cờ \"/i\" (tasksche.exe /i)",
+    "cat": "Malware Dropper Switch",
+    "def": "Tham số dòng lệnh chỉ thị chế độ Install (Cài đặt) của tiến trình giải nén tasksche.exe.",
+    "mech": "Mã độc thả C:\\Windows\\tasksche.exe rồi gọi CreateProcess với tham số \"/i\". Trình kiểm tra tham số kích hoạt đoạn mã đọc Resource section (.rsrc) chứa kho lưu trữ ZIP mã hóa.",
+    "abuse": "Giải nén toàn bộ kho công cụ tống tiền vào thư mục C:\\ProgramData\\evmdthrukdvwcqn063\\, đăng ký dịch vụ thứ hai và tạo tệp c.wnry, t.wnry, taskhsvc.exe, @WanaDecryptor@.exe.",
+    "defense": "Quy tắc Sigma / Sysmon phát hiện tiến trình tasksche.exe chạy với tham số /i sinh ra từ tiến trình không xác định."
+  },
+  "icacls": {
+    "title": "Lệnh \"icacls . /grant Everyone:F /T /C /Q\"",
+    "cat": "Windows File Security (ACL)",
+    "def": "Công cụ dòng lệnh quản lý Access Control List (ACL) cho hệ thống tệp tin NTFS.",
+    "mech": "icacls cập nhật Discretionary Access Control List (DACL) của Security Descriptor đối tượng tệp tin. Cờ /T duyệt đệ quy (traverse subdirectories), /C tiếp tục kể cả khi gặp lỗi, /Q chế độ im lặng, Everyone:F cấp Full Control cho mọi tài khoản.",
+    "abuse": "Xóa bỏ mọi rào cản hạn chế quyền đọc/ghi trên thư mục làm việc ProgramData, đảm bảo mọi tiến trình con dù chạy dưới tài khoản nào cũng có quyền tối thượng.",
+    "defense": "Khóa khả năng thực thi icacls từ các script không tin cậy; giám sát dòng lệnh thực thi icacls có chứa chuỗi \"Everyone:F\"."
+  },
+  "attrib": {
+    "title": "Lệnh \"attrib +h .\"",
+    "cat": "Windows File Attributes",
+    "def": "Công cụ quản lý cờ thuộc tính siêu dữ liệu (Metadata Attributes) của tệp và thư mục trên DOS/Windows.",
+    "mech": "Gán cờ FILE_ATTRIBUTE_HIDDEN (0x02) trong Master File Table (MFT) của phân vùng NTFS.",
+    "abuse": "Che giấu thư mục làm việc C:\\ProgramData\\evmdthrukdvwcqn063\\ khỏi chế độ xem mặc định của Windows Explorer, khiến người dùng thông thường không nhìn thấy thư mục mã độc khi mở máy.",
+    "defense": "Bật tùy chọn \"Show hidden files, folders, and drives\" trong Windows Explorer; cảnh báo EDR khi attrib.exe được gọi bởi tiến trình lạ."
+  },
+  "killswitch": {
+    "title": "Cơ chế Kill-Switch (Công tắc Tự hủy)",
+    "cat": "Anti-Analysis / Sandbox Evasion",
+    "def": "Điều kiện rẽ nhánh nhị phân dựa trên kết nối mạng được cài cắm trong mã độc.",
+    "mech": "Mã độc gọi hàm WinINet API (InternetOpenA, InternetOpenUrlA) gửi yêu cầu HTTP GET tới tên miền kill-switch. Nếu InternetOpenUrlA trả về handle hợp lệ (HTTP 200), mã độc gọi ExitProcess(0).",
+    "abuse": "Tác giả thiết kế cơ chế này để phát hiện máy ảo sandbox phân tích mã độc (vốn thường phân giải và giả lập trả lời 200 OK cho mọi tên miền). Nhờ Marcus Hutchins đăng ký tên miền này, hàng trăm nghìn máy tính toàn cầu đã được kích hoạt chế độ tự hủy an toàn.",
+    "defense": "Lưu ý phương pháp luận: Kill-switch là điều kiện logic nội tại của mã độc, không phải là lỗ hổng của Windows. Không thể dựa vào kill-switch như một biện pháp bảo mật dài hạn."
+  },
+  "cryptoapi": {
+    "title": "Windows CryptoAPI (rsaenh.dll, CRYPTSP.dll)",
+    "cat": "Cryptography Subsystem",
+    "def": "Giao diện lập trình ứng dụng mật mã tích hợp sẵn trong hệ điều hành Microsoft Windows.",
+    "mech": "Cung cấp các hàm CryptAcquireContext, CryptGenRandom, CryptImportKey, CryptEncrypt cho các ứng dụng native thông qua các Cryptographic Service Providers (CSP) như Microsoft Enhanced Cryptographic Provider (rsaenh.dll).",
+    "abuse": "WannaCry sử dụng mô hình mã hóa lai (Hybrid Encryption): sinh khóa đối xứng AES-128 ngẫu nhiên qua CryptoAPI để mã hóa tệp cực nhanh, sau đó mã hóa khóa AES bằng khóa công khai RSA-2048 của kẻ tấn công trước khi ghi vào header tệp.",
+    "defense": "Giám sát hành vi nạp rsaenh.dll kèm theo tần suất mở/ghi tệp tin hàng loạt trong thời gian ngắn (Ransomware Behavioral Heuristics)."
+  },
+  "file_lifecycle": {
+    "title": "Vòng đời Tệp Tin (.WNCRYT -> .WNCRY)",
+    "cat": "Atomic File Operation",
+    "def": "Quy trình chuyển đổi tệp tin nguyên tử nhằm đảm bảo tính toàn vẹn của quá trình tống tiền.",
+    "mech": "Mã độc đọc tệp gốc -> Mã hóa ra tệp tạm có đuôi mở rộng .WNCRYT -> Ghi header 8-byte WANACRY! -> Xóa tệp gốc -> Gọi lệnh I/O hệ thống SetRenameInformationFile để đổi tên tệp từ .WNCRYT sang .WNCRY.",
+    "abuse": "Ngăn chặn việc tệp bị hỏng dở dang nếu hệ thống đột ngột mất điện; đồng thời hỗ trợ tiến trình dọn dẹp taskdl.exe dễ dàng dò quét và xóa tệp thừa.",
+    "defense": "Quy tắc phát hiện tệp tin mới được tạo mang phần mở rộng kép hoặc phần mở rộng đáng ngờ .WNCRYT / .WNCRY."
+  },
+  "wanacry_header": {
+    "title": "Header Nhị Phân \"WANACRY!\"",
+    "cat": "Binary File Magic Header",
+    "def": "Chuỗi định danh 8 byte (\"57 41 4E 41 43 52 59 21\") được ghi vào đầu mỗi tệp tin sau khi mã hóa.",
+    "mech": "Nằm tại offset 0x00 của tệp tin bị khóa, theo sau là kích thước khối khóa đã mã hóa và khóa AES được bọc bằng RSA.",
+    "abuse": "Giúp mã độc kiểm tra nhanh xem một tệp đã bị mã hóa hay chưa khi quét đĩa, tránh mã hóa 2 lần làm hỏng vĩnh viễn dữ liệu của nạn nhân.",
+    "defense": "Sử dụng chữ ký YARA quét định kỳ hệ thống tệp để phát hiện các file mang magic bytes này."
+  },
+  "lotl": {
+    "title": "Living off the Land (cmd.exe, cscript.exe)",
+    "cat": "Attack Methodology",
+    "def": "Chiến thuật tấn công tận dụng các công cụ và tiện ích quản trị hợp pháp có sẵn trong hệ điều hành Windows.",
+    "mech": "Hệ điều hành xem cmd.exe, cscript.exe, icacls.exe, attrib.exe là các tệp nhị phân được Microsoft ký số tin cậy (Trusted Microsoft Binaries).",
+    "abuse": "WannaCry không tự nhúng mã tạo shortcut hay sửa thuộc tính file vào binary chính mà gọi các tiện ích này ở chế độ nền để giảm thiểu dung lượng file và né tránh sự nghi ngờ của các công cụ diệt virus đơn giản.",
+    "defense": "Giám sát tiến trình cha - con bất thường: Cảnh báo khi một tiến trình lạ trong ProgramData gọi cmd.exe hoặc cscript.exe."
+  },
+  "ms17010": {
+    "title": "Lỗ hổng MS17-010 / EternalBlue",
+    "cat": "Remote Code Execution Vulnerability",
+    "def": "Lỗ hổng tràn bộ đệm nghiêm trọng trong giao thức chia sẻ tệp SMBv1 (Server Message Block) của Microsoft Windows.",
+    "mech": "Lỗi xử lý gói tin SMBv1 FEA (File Extended Attribute) cho phép kẻ tấn công gửi gói tin độc hại qua cổng TCP 445 làm tràn bộ đệm kernel (srv.sys).",
+    "abuse": "WannaCry tích hợp mã khai thác EternalBlue để quét toàn bộ dải mạng LAN và Internet, tự động chiếm quyền SYSTEM trên các máy tính chưa vá mà không cần người dùng thao tác.",
+    "defense": "Cài đặt bản vá bảo mật khẩn cấp MS17-010 (KB4012212, KB4012215) và vô hiệu hóa hoàn toàn giao thức SMBv1 trên toàn mạng."
+  }
+}
