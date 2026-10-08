@@ -1,0 +1,402 @@
+[
+  {
+    "id": "behavior-01",
+    "num": "01",
+    "cat": "Network Branching & Evasion",
+    "title": "Cơ Chế Công Tắc Hủy (Kill-Switch) & Rẽ Nhánh Thực Thi",
+    "badge": "HTTP 200 OK → Exit Code 0",
+    "step1_concept": "Kill-switch là một điều kiện rẽ nhánh logic do tác giả cài đặt vào mã độc. Nhiều nhà nghiên cứu nhận định tính năng này ban đầu được dùng như cơ chế chống máy ảo/sandbox phân tích tự động (Anti-Analysis): trong môi trường lab tự động, các công cụ phân tích thường phân giải và giả lập trả lời 200 OK cho mọi yêu cầu mạng, khiến mã độc lầm tưởng nó đang bị theo dõi và lập tức tự kết thúc để giấu hành vi.",
+    "step2_params": "Mã độc gọi WinINet API gửi yêu cầu HTTP GET tới tên miền: www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com (chưa từng được đăng ký trước ngày 12/05/2017).",
+    "step3_os": "Hệ điều hành Windows xử lý qua wininet.dll. Nếu hàm InternetOpenUrlA thành công và nhận mã phản hồi HTTP 200, luồng điều khiển nhảy tới lời gọi ExitProcess(0). Nếu kết nối thất bại hoặc Timeout (thử lại 4 lần), hàm trả về NULL và kích hoạt Kịch bản B.",
+    "step4_cause": "Quyết định rẽ nhánh nhị phân tối hậu: Nhận HTTP 200 OK -> PID 6520 tự hủy sạch trong 0.89 giây, 0 tệp bị đổi. Mất kết nối mạng -> ngay lập tức khởi tạo Dịch vụ mssecsvc2.0 và bắt đầu chuỗi phá hủy.",
+    "evidence_a": {
+      "tool": "Burp Suite Pro",
+      "title": "Burp Suite Pro: Bắt gói tin Kill-switch HTTP 200",
+      "file": "screenshots/A_burp_item4_host_verified_vmware.png",
+      "caption": "Item #4 lúc 11:44:17. Gói tin HTTP 200 OK (155 bytes) chặn đứng đợt tấn công từ PID 6520.",
+      "breakdown": [
+        {
+          "field": "Target URL",
+          "val": "www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com"
+        },
+        {
+          "field": "HTTP Method",
+          "val": "GET / HTTP/1.1 (Cổng 80)"
+        },
+        {
+          "field": "Response",
+          "val": "HTTP/1.1 200 OK (Mock Server)"
+        },
+        {
+          "field": "Content-Length",
+          "val": "155 bytes"
+        }
+      ]
+    },
+    "evidence_b": {
+      "tool": "Process Monitor",
+      "title": "Procmon: Tiến trình tự hủy với Exit Code 0",
+      "file": "screenshots/A_run_direct_launch_1143_vmware.png",
+      "caption": "Bản ghi Procmon xác minh PID 6520 kết thúc với Exit Status: 0, thời gian sống tổng cộng 0.8922 giây.",
+      "breakdown": [
+        {
+          "field": "Process Name",
+          "val": "24d004a1...exe (PID 6520)"
+        },
+        {
+          "field": "Event",
+          "val": "Process Exit"
+        },
+        {
+          "field": "Exit Status",
+          "val": "0 (SUCCESS)"
+        },
+        {
+          "field": "Total Lifetime",
+          "val": "0.8922 giây (11:44:16 -> 11:44:17)"
+        }
+      ]
+    },
+    "boundary_proven": "Chứng minh mã độc hoàn toàn phụ thuộc vào phản hồi mạng từ URL trên. Có HTTP 200 là tự dừng ngay mà không sinh thêm bất kỳ tiến trình nào hay mã hóa file.",
+    "boundary_limit": "Kill-switch là điều kiện logic của mã độc, KHÔNG PHẢI là lỗ hổng của Windows. Việc tiến trình thoát mã 0 không chứng minh mã độc đã bị xóa khỏi đĩa cứng hay hệ thống đã an toàn tuyệt đối.",
+    "terms": [
+      "killswitch",
+      "localsystem"
+    ]
+  },
+  {
+    "id": "behavior-02",
+    "num": "02",
+    "cat": "System Persistence",
+    "title": "Đăng Ký Dịch Vụ Windows Ngầm (mssecsvc2.0 Quyền SYSTEM)",
+    "badge": "Start Type = Auto Start (2)",
+    "step1_concept": "Thay vì dùng khóa Run trong Registry dễ bị Antivirus phát hiện, WannaCry sử dụng API của Windows Service Control Manager (SCM) để đăng ký dịch vụ hệ thống chạy vĩnh viễn dưới tài khoản quyền lực nhất: NT AUTHORITY\\SYSTEM.",
+    "step2_params": "Dịch vụ gọi binary: C:\\LabLive\\Sample_ready\\24d004a1...exe -m security. Cờ \"-m security\" chỉ thị chạy ở chế độ Service Worker ngầm và kích hoạt luồng quét mạng lây lan SMB.",
+    "step3_os": "Cấu hình được ghi trực tiếp vào HKLM\\SYSTEM\\CurrentControlSet\\Services\\mssecsvc2.0 với thuộc tính Start = 2 (SERVICE_AUTO_START). SCM (services.exe) sẽ tự động nạp tiến trình này mỗi khi máy tính khởi động trước khi người dùng đăng nhập.",
+    "step4_cause": "Xảy ra ngay sau khi kết nối mạng tới kill-switch thất bại 4 lần. Dịch vụ này đóng vai trò máy chủ điều phối cấp cao để sinh ra tiến trình thả payload tasksche.exe.",
+    "evidence_a": {
+      "tool": "Process Hacker",
+      "title": "Process Hacker: Thuộc tính dịch vụ mssecsvc2.0",
+      "file": "screenshots/B_service_mssecsvc_properties_vmware.png",
+      "caption": "Xác minh đường dẫn binary chứa cờ -m security, tài khoản thực thi LocalSystem và chế độ Auto start.",
+      "breakdown": [
+        {
+          "field": "Service Name",
+          "val": "mssecsvc2.0 (Display: Microsoft Security Center (2.0))"
+        },
+        {
+          "field": "Binary Path",
+          "val": "C:\\LabLive\\Sample_ready\\24d004a1...exe -m security"
+        },
+        {
+          "field": "Service Account",
+          "val": "NT AUTHORITY\\LocalSystem"
+        },
+        {
+          "field": "Start Type",
+          "val": "Auto start (2)"
+        }
+      ]
+    },
+    "evidence_b": {
+      "tool": "Process Hacker",
+      "title": "Process Hacker: Trạng thái Running của mssecsvc2.0",
+      "file": "screenshots/B_service_mssecsvc_selected_vmware.png",
+      "caption": "Tab Services hiển thị dịch vụ độc hại ngụy trang với trạng thái Running, PID 5272.",
+      "breakdown": [
+        {
+          "field": "Status",
+          "val": "Running (Đang thực thi ngầm)"
+        },
+        {
+          "field": "PID Assigned",
+          "val": "5272"
+        },
+        {
+          "field": "Parent Process",
+          "val": "services.exe (PID 644)"
+        },
+        {
+          "field": "Registry Key",
+          "val": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\mssecsvc2.0"
+        }
+      ]
+    },
+    "boundary_proven": "Chứng minh cơ chế Persistence sống sót sau Reboot: Dù máy tính khởi động lại, dịch vụ vẫn tự chạy lại với quyền SYSTEM.",
+    "boundary_limit": "Do máy ảo bị cô lập mạng vật lý, nhánh quét SMB port 445 của service này không phát tán sang máy khác được.",
+    "terms": [
+      "localsystem",
+      "services",
+      "flags_m",
+      "ms17010"
+    ]
+  },
+  {
+    "id": "behavior-03",
+    "num": "03",
+    "cat": "Dropper & Payload Extraction",
+    "title": "Thả Payload & Giải Nén Vào Thư Mục Hệ Thống (tasksche.exe /i)",
+    "badge": "Dropped → C:\\ProgramData\\evmdthruk...",
+    "step1_concept": "Mẫu ban đầu không trực tiếp mã hóa mà đóng vai trò \"Dropper\" (Bộ giải nén chứa payload). Nó chứa một kho tệp nén ZIP mã hóa mật khẩu trong tài nguyên (.rsrc) chứa toàn bộ công cụ tống tiền.",
+    "step2_params": "Tiến trình gọi: C:\\WINDOWS\\tasksche.exe /i. Cờ \"/i\" là cờ cài đặt (Install), hướng dẫn mã độc giải nén toàn bộ payload vào thư mục C:\\ProgramData\\evmdthrukdvwcqn063\\ và đăng ký dịch vụ thứ hai.",
+    "step3_os": "Hệ điều hành cấp phát không gian trong ProgramData (thư mục chia sẻ toàn hệ thống không yêu cầu quyền riêng của từng user) để mọi tài khoản trên máy đều bị ảnh hưởng.",
+    "step4_cause": "Sau khi giải nén xong, tệp tasksche.exe trong ProgramData (PID 3760) được kích hoạt dưới quyền SYSTEM thông qua vỏ bọc cmd.exe. Đây chính là tiến trình chịu trách nhiệm quét và mã hóa file.",
+    "evidence_a": {
+      "tool": "Process Monitor",
+      "title": "Procmon: Cây tiến trình mở rộng 15 nhánh",
+      "file": "screenshots/B_procmon_tree_expanded_vmware.png",
+      "caption": "Nhánh thực thi từ services.exe -> PID 5272 -> tasksche.exe /i (PID 6724) -> tasksche.exe (PID 3760).",
+      "breakdown": [
+        {
+          "field": "Dropper Path",
+          "val": "C:\\WINDOWS\\tasksche.exe"
+        },
+        {
+          "field": "Command Flag",
+          "val": "/i (Install)"
+        },
+        {
+          "field": "Extracted Dir",
+          "val": "C:\\ProgramData\\evmdthrukdvwcqn063\\"
+        },
+        {
+          "field": "Installer PID",
+          "val": "6724 (Parent: 5152)"
+        }
+      ]
+    },
+    "evidence_b": {
+      "tool": "Process Monitor",
+      "title": "Procmon: Bản ghi định danh tiến trình PID 3760 SYSTEM",
+      "file": "screenshots/B_procmon_event_process_identity_vmware.png",
+      "caption": "Bản ghi chi tiết sự kiện của PID 3760 xác minh User: NT AUTHORITY\\SYSTEM.",
+      "breakdown": [
+        {
+          "field": "Core Encryptor",
+          "val": "tasksche.exe (PID 3760)"
+        },
+        {
+          "field": "User Context",
+          "val": "NT AUTHORITY\\SYSTEM"
+        },
+        {
+          "field": "Integrity Level",
+          "val": "System Integrity"
+        },
+        {
+          "field": "Session ID",
+          "val": "0 (Non-interactive Service Session)"
+        }
+      ]
+    },
+    "boundary_proven": "Chứng minh quá trình chuyển giao vai trò từ Dropper ban đầu sang Payload độc lập trong ProgramData.",
+    "boundary_limit": "Không thể đọc trực tiếp mật khẩu giải nén ZIP tài nguyên nếu chỉ nhìn log Procmon (cần dịch ngược tĩnh file nhị phân).",
+    "terms": [
+      "tasksche_i",
+      "localsystem",
+      "services"
+    ]
+  },
+  {
+    "id": "behavior-04",
+    "num": "04",
+    "cat": "Defense Evasion & Privilege Escalation",
+    "title": "Thao Túng Thuộc Tính Ẩn & Quyền Hệ Thống (icacls & attrib)",
+    "badge": "icacls Everyone:F & attrib +h",
+    "step1_concept": "Để ngăn chặn người dùng hoặc phần mềm bảo vệ xóa thư mục mã hóa hoặc truy cập tệp cấu hình, mã độc sử dụng công cụ dòng lệnh có sẵn của Windows (Living off the Land) để ẩn mình và mở rộng quyền truy cập.",
+    "step2_params": "Mã độc thực thi 2 lệnh đồng thời: 1) attrib +h . (gán thuộc tính Ẩn cho thư mục hiện tại); 2) icacls . /grant Everyone:F /T /C /Q (cấp toàn quyền Full Control đệ quy cho nhóm Everyone).",
+    "step3_os": "Windows áp dụng Access Control Entry (ACE) mới vào Security Descriptor của thư mục và gán cờ FILE_ATTRIBUTE_HIDDEN vào Master File Table (MFT), đảm bảo mọi tiến trình con không bị lỗi Access Denied.",
+    "step4_cause": "Lệnh này chạy ngay trước khi đợt mã hóa hàng loạt bắt đầu, dọn đường cho việc ghi đè dữ liệu diễn ra trơn tru mà không bị xung đột phân quyền.",
+    "evidence_a": {
+      "tool": "Process Hacker",
+      "title": "Process Hacker: Danh sách Handles của tasksche.exe",
+      "file": "screenshots/B_processhacker_tasksche_handles_vmware.png",
+      "caption": "Mutant MsWinZonesCacheCounterMutexA, Mutex và File handles đang mở bởi tasksche.exe.",
+      "breakdown": [
+        {
+          "field": "Mutant Handle",
+          "val": "MsWinZonesCacheCounterMutexA"
+        },
+        {
+          "field": "Directory Handle",
+          "val": "C:\\ProgramData\\evmdthrukdvwcqn063\\"
+        },
+        {
+          "field": "Access Mask",
+          "val": "All Access / Full Control"
+        },
+        {
+          "field": "Sub-processes",
+          "val": "icacls.exe (PID 2064), attrib.exe (PID 5808)"
+        }
+      ]
+    },
+    "evidence_b": {
+      "tool": "Process Monitor",
+      "title": "Procmon: Chuỗi sự kiện can thiệp tệp tin và lệnh",
+      "file": "screenshots/B_procmon_decoy_events_vmware.png",
+      "caption": "Nhật ký Procmon ghi nhận các sự kiện CreateFile, WriteFile trên thư mục mã độc và thư mục Decoys.",
+      "breakdown": [
+        {
+          "field": "icacls Syntax",
+          "val": "icacls . /grant Everyone:F /T /C /Q"
+        },
+        {
+          "field": "attrib Syntax",
+          "val": "attrib +h ."
+        },
+        {
+          "field": "Console Host",
+          "val": "conhost.exe 0xffffffff -ForceV1"
+        },
+        {
+          "field": "Procmon Records",
+          "val": "216 rows (icacls) + 7 rows (attrib)"
+        }
+      ]
+    },
+    "boundary_proven": "Chứng minh mã độc tận dụng các công cụ hệ thống hợp pháp (LotL) để thao túng quyền tệp và né tránh phát hiện.",
+    "boundary_limit": "Lệnh icacls này chỉ tác động lên thư mục của mã độc trong ProgramData, không tác động trực tiếp lên toàn bộ ổ đĩa C.",
+    "terms": [
+      "icacls",
+      "attrib",
+      "lotl",
+      "localsystem"
+    ]
+  },
+  {
+    "id": "behavior-05",
+    "num": "05",
+    "cat": "Cryptographic Impact",
+    "title": "Vòng Đời Mã Hóa Tệp Mồi Decoy & Header Nhị Phân WANACRY!",
+    "badge": "SetRenameInformationFile (.WNCRY)",
+    "step1_concept": "Lưu ý phương pháp luận: Cần phân biệt rõ giữa \"Quan sát thấy tệp bị thay đổi\" và \"Chứng minh thuật toán/quản lý khóa mã hóa\". Qua phân tích động (Dynamic), ta xác minh được vòng đời biến đổi tệp tin; còn cấu trúc khóa AES-128 / RSA-2048 phải kiểm chứng qua các thư viện CryptoAPI được nạp (rsaenh.dll, CRYPTSP.dll).",
+    "step2_params": "Mã độc quét đĩa, đọc file gốc -> mã hóa trong bộ nhớ -> ghi ra file tạm .WNCRYT chứa header 8-byte WANACRY! -> xóa file gốc -> gọi SetRenameInformationFile đổi tên sang .WNCRY.",
+    "step3_os": "Hệ điều hành Windows xử lý thao tác đổi tên nguyên tử (Atomic Rename) qua I/O Manager, đảm bảo dữ liệu không bị hỏng nếu hệ thống mất điện giữa chừng.",
+    "step4_cause": "100% tệp mồi Decoy (inventory.csv, lab_document.rtf, student_notes.txt) bị mã hóa trong chưa đầy 12 mili-giây. Kích thước file tăng lên đúng bằng khối header metadata WANACRY! cộng thêm padding AES.",
+    "evidence_a": {
+      "tool": "Process Monitor",
+      "title": "Procmon: Thuộc tính đổi tên sang đuôi .WNCRY",
+      "file": "screenshots/B_procmon_rename_properties_vmware.png",
+      "caption": "Chi tiết sự kiện SetRenameInformationFile: FileName đổi từ inventory.csv.WNCRYT sang inventory.csv.WNCRY.",
+      "breakdown": [
+        {
+          "field": "Operation",
+          "val": "SetRenameInformationFile"
+        },
+        {
+          "field": "Source Path",
+          "val": "C:\\LabLive\\Decoys\\inventory.csv.WNCRYT"
+        },
+        {
+          "field": "Target Path",
+          "val": "C:\\LabLive\\Decoys\\inventory.csv.WNCRY"
+        },
+        {
+          "field": "Process",
+          "val": "tasksche.exe (PID 3760 SYSTEM)"
+        }
+      ]
+    },
+    "evidence_b": {
+      "tool": "Windows Explorer",
+      "title": "Explorer: 3 Tệp mồi bị khóa và đổi hình nền",
+      "file": "screenshots/B_decoys_encrypted_host_verified_vmware.png",
+      "caption": "File Explorer xác minh 3 tệp mồi mang biểu tượng khóa .WNCRY kèm file @Please_Read_Me@.txt và hình nền đen.",
+      "breakdown": [
+        {
+          "field": "Decoys Affected",
+          "val": "3/3 tệp (inventory.csv, lab_doc.rtf, notes.txt)"
+        },
+        {
+          "field": "Ransom Note",
+          "val": "@Please_Read_Me@.txt"
+        },
+        {
+          "field": "Magic Header",
+          "val": "WANACRY! (Offset 0x00)"
+        },
+        {
+          "field": "Wallpaper",
+          "val": "Đổi sang màu đen cảnh báo nạn nhân"
+        }
+      ]
+    },
+    "boundary_proven": "Chứng minh vòng đời tệp tin nguyên tử, header WANACRY! và thiệt hại 100% dữ liệu mồi.",
+    "boundary_limit": "Không thể khôi phục dữ liệu nếu không có Private Key RSA-2048 của kẻ tấn công (hoặc công cụ phục hồi bộ nhớ wanakiwi khi chưa reboot).",
+    "terms": [
+      "file_lifecycle",
+      "wanacry_header",
+      "cryptoapi"
+    ]
+  },
+  {
+    "id": "behavior-06",
+    "num": "06",
+    "cat": "Extortion & Impact",
+    "title": "Giao Diện Tống Tiền Wana Decrypt0r 2.0 & Đòi Tiền Chuộc",
+    "badge": "Wana Decrypt0r 2.0 & $300 BTC",
+    "step1_concept": "Sau khi hoàn tất mã hóa các tài liệu quan trọng, mã độc thông báo cho nạn nhân biết dữ liệu đã bị khóa và hướng dẫn cách nộp tiền chuộc để kẻ tấn công thu lợi bất chính.",
+    "step2_params": "Tiến trình @WanaDecryptor@.exe (PID 1752) được khởi chạy. Nạp các thư viện giao diện MFC42.DLL, COMCTL32.dll, RICHED20.dll.",
+    "step3_os": "Mã độc gọi API SystemParametersInfoW(SPI_SETDESKWALLPAPER) trỏ vào tệp bitmap tạo sẵn để đổi hình nền toàn hệ thống. Đồng thời gọi cscript.exe //nologo m.vbs tạo shortcut @WanaDecryptor@.exe.lnk trên Desktop.",
+    "step4_cause": "Mắt xích cuối cùng của chiến dịch tấn công trên máy tính nạn nhân, tạo áp lực tâm lý bằng 2 đồng hồ đếm ngược.",
+    "evidence_a": {
+      "tool": "Ransomware GUI",
+      "title": "Ransom GUI: Giao diện Wana Decrypt0r 2.0 kèm nhãn sinh viên",
+      "file": "screenshots/B_ransom_gui_final_identity_vmware.png",
+      "caption": "Cửa sổ Wana Decrypt0r 2.0 hiển thị 2 đồng hồ đếm ngược, đòi 300$ Bitcoin về ví 115p7UMM... kèm nhãn Nguyen Van Bach (DE200409).",
+      "breakdown": [
+        {
+          "field": "Ransom Amount",
+          "val": "$300 USD (bằng Bitcoin)"
+        },
+        {
+          "field": "BTC Wallet",
+          "val": "115p7UMMngoj1pMvkpHijcRdfJNXj6LrLn"
+        },
+        {
+          "field": "Timer 1 (Double price)",
+          "val": "3 ngày (Tăng lên $600)"
+        },
+        {
+          "field": "Timer 2 (Delete files)",
+          "val": "7 ngày (Xóa vĩnh viễn)"
+        },
+        {
+          "field": "Student Tag",
+          "val": "Nguyen Van Bach (DE200409)"
+        }
+      ]
+    },
+    "evidence_b": {
+      "tool": "Process Hacker",
+      "title": "Process Hacker: Loaded Modules CryptoAPI và GUI MFC",
+      "file": "screenshots/B_processhacker_tasksche_modules_vmware.png",
+      "caption": "Process Hacker xác minh danh mục DLLs: rsaenh.dll, CRYPTSP.dll, MFC42.DLL nạp vào bộ nhớ.",
+      "breakdown": [
+        {
+          "field": "Crypto Providers",
+          "val": "rsaenh.dll, CRYPTSP.dll, CRYPTBASE.dll"
+        },
+        {
+          "field": "GUI Libraries",
+          "val": "MFC42.DLL, COMCTL32.dll, RICHED20.dll"
+        },
+        {
+          "field": "Process Memory",
+          "val": "Working Set ~ 18.4 MB"
+        },
+        {
+          "field": "Window Handle",
+          "val": "WanaCrypt0r v2.0 TopMost Window"
+        }
+      ]
+    },
+    "boundary_proven": "Chứng minh toàn bộ chuỗi tống tiền diễn ra hoàn chỉnh và tự động trong môi trường lab cô lập.",
+    "boundary_limit": "Nút \"Check Payment\" và \"Decrypt\" trên giao diện không thể hoạt động do máy ảo không có kết nối ra mạng Tor/Internet.",
+    "terms": [
+      "lotl",
+      "cryptoapi"
+    ]
+  }
+]
