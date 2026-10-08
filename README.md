@@ -1,42 +1,21 @@
-# Báo cáo kỹ thuật phân tích hành vi mẫu WannaCry trong môi trường kiểm soát
+# WannaCry — Báo cáo hành vi
 
-> **Cách đọc:** đọc mục 1 để nắm kết quả, mở từng chương để hiểu cơ chế, dùng timeline và nguồn để kiểm chứng. Markdown hỗ trợ mở/đóng nội dung bằng `<details>`; không chạy React/MDX hoặc live demo. Ảnh giữ nguyên các tệp PNG đã cung cấp, có khung VMware, không phải giao diện tương tác.
-
-- **Học phần / người thực hiện:** IAM302 — Nguyen Van Bach, DE200409.
-- **Mẫu:** `24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe`
-- **SHA-256:** `24D004A104D4D54034DBCFFC2A4B19A11F39008A575AA614EA04703480B1022C`
-- **Máy quan sát:** Windows 10 build `19044`, tài khoản thí nghiệm `DESKTOP-V5VC9B3\bachdeptrai`.
-- **Phạm vi:** hai lần chạy có kiểm soát ngày `2026-10-08` (UTC+7); Procmon, transcript PowerShell, log responder, chênh lệch service/task/Run key, Event ID 7045, Sysinternals Handle/ListDLLs và ba tệp decoy.
-
-> **Phạm vi xuất bản:** sửa `README.md` chỉ thay tài liệu trên Git repository/GitHub. SPA production hiện không có route hay renderer MD/MDX cho README; nội dung này không tự xuất hiện trong SPA nếu ứng dụng không được bổ sung chức năng đó.
-
----
-
-<a id="muc-luc"></a>
-## Mục lục
-
-1. [Kết luận nhanh](#ket-luan-nhanh)
-2. [Cách đọc chứng cứ](#cach-doc-chung-cu)
-3. [Khái niệm và thiết kế phép thử](#khai-niem-va-thiet-ke)
-4. [Sáu chương hành vi](#sau-chuong-hanh-vi)
-   1. [Nhánh mạng và kill switch](#hanh-vi-1)
-   2. [Dịch vụ Windows và persistence cấu hình](#hanh-vi-2)
-   3. [Thả payload và chuỗi tiến trình](#hanh-vi-3)
-   4. [`attrib` và `icacls`](#hanh-vi-4)
-   5. [Biến đổi ba tệp decoy](#hanh-vi-5)
-   6. [Ransom note, shortcut và GUI](#hanh-vi-6)
-5. [Dòng thời gian đã hiệu chỉnh](#dong-thoi-gian)
-6. [Bảng tiến trình](#bang-tien-trinh)
-7. [Command tokens](#command-tokens)
-8. [IOC](#ioc)
-9. [MITRE ATT&CK](#mitre)
-10. [Biên kiểm toán](#bien-kiem-toan)
-11. [Chín câu hỏi học phần](#chin-cau-hoi)
-12. [Nguồn và liên kết tham khảo](#nguon-tham-khao)
-
----
+Hai lần chạy có kiểm soát đối chiếu phản ứng của mẫu khi endpoint kill-switch tới được hoặc không tới được; kết luận dựa trên Procmon, log và artifact, giới hạn trong cửa sổ thí nghiệm.
 
 <a id="ket-luan-nhanh"></a>
+
+- **A · Thoát sớm.** Responder trả HTTP 200; mẫu thoát `0`, ba decoy giữ nguyên, không có service mới.
+- **B · Chuỗi tác động tiếp tục.** Hai service mới, payload được thả, ba decoy đổi thành `.WNCRY`, ransom artifacts xuất hiện.
+- **Giới hạn · Không suy rộng.** Chưa chứng minh nhánh code nội bộ, persistence sau reboot hoặc mã hóa toàn máy.
+
+[Kết quả đối chiếu](#doi-chieu) · [Sáu hành vi](#sau-chuong-hanh-vi) · [Kiểm chứng và nguồn](#kiem-chung)
+
+
+<a id="doi-chieu"></a>
+
+<details>
+<summary>Bảng đối chiếu A/B và giới hạn kết luận</summary>
+
 ## 1. Kết luận nhanh
 
 | Nội dung | Kịch bản A — responder cục bộ trả HTTP 200 | Kịch bản B — responder không tới được |
@@ -56,44 +35,20 @@
 - `155` trong Procmon là độ dài của sự kiện `TCP Receive`, không phải `Content-Length` HTTP. Burp hiển thị response `Content-Length: 3`.
 - “15 tiến trình được quy thuộc” gồm binary mẫu, payload và tiện ích Windows (`cmd.exe`, `attrib.exe`, `icacls.exe`, `cscript.exe`, `Conhost.exe`); không phải 15 binary mã độc độc lập.
 
----
-
-<a id="cach-doc-chung-cu"></a>
-## 2. Cách đọc chứng cứ
-
-| Nhãn | Ý nghĩa |
-|---|---|
-| **Quan sát** | Có trực tiếp trong file/log/ảnh được dẫn nguồn. |
-| **Diễn giải** | Ý nghĩa hợp lý của quan sát, vẫn tách khỏi dữ kiện gốc. |
-| **Cơ chế** | Windows xử lý thao tác như thế nào; không đồng nghĩa đã hook được API. |
-| **Liên kết nhân quả** | Chuỗi thời gian, parent/child, file path hoặc cấu hình service nối các sự kiện. |
-| **Giới hạn** | Điều dữ liệu hiện có không chứng minh. |
-
-**Quy ước record:** mọi số `R...` trong báo cáo này là **1-based data record index, không tính dòng header**, được đọc bằng `csv.DictReader`. Quy ước này đã hiệu chỉnh sai lệch +1 trong một số báo cáo trung gian. Trường CSV có newline nhúng; không dùng số dòng vật lý của file văn bản làm record index.
-
----
-
-<a id="khai-niem-va-thiet-ke"></a>
-## 3. Khái niệm và thiết kế phép thử
-
-- **Kill switch:** điều kiện môi trường khiến chương trình ngừng hoặc tiếp tục. Trong phép thử, domain `www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com` được ánh xạ về loopback. Đây không phải C2 đã xác nhận.
-- **Dropper/payload:** tiến trình ban đầu ghi thành phần khác xuống đĩa rồi kích hoạt chúng. Tên switch `-m security` và `/i` được quan sát như token dòng lệnh; ý nghĩa nội bộ của từng switch chưa được chứng minh bằng hook API hoặc dịch ngược trong bộ chứng cứ này.
-- **Persistence cấu hình:** service có `Start=2`/Auto tạo điều kiện chạy khi boot. Khả năng sống sót và chạy thành công sau reboot chỉ được xác nhận bằng một phép thử reboot; phép thử đó **không được thực hiện**.
-- **Decoy:** ba tệp thử nghiệm có hash baseline, đặt tại `C:\Users\bachdeptrai\Documents\IAM302_Decoys_20261008`. Chúng cho phép kết luận hẹp, kiểm chứng được.
-- **Attribution:** một bản ghi được gán vào chuỗi hành vi dựa trên PID, parent, command line và cầu nối SCM. “Attributed” không biến mọi executable Windows trong chuỗi thành malware binary.
-- **Ảnh chụp:** ảnh hỗ trợ bối cảnh nhìn thấy. CSV/log/hash là nguồn định lượng. Ảnh không thay thế sự kiện thô.
-- **Service và chương trình thông thường:** chương trình thường được người dùng mở trong phiên đăng nhập; service có cấu hình và vòng đời do SCM quản lý, có thể chạy khi chưa có người đăng nhập. `services.exe` là tiến trình quản lý dịch vụ, không phải bản thân payload.
-- **LocalSystem:** tài khoản dịch vụ có đặc quyền cao trên máy cục bộ. Thấy token SYSTEM giải thích phạm vi quyền thực thi, không chứng minh mọi tệp đều truy cập được. Tạo service cần quyền thích hợp đối với SCM; đăng ký service không tự vượt qua kiểm soát quyền.
-- **DACL và ACL:** danh sách quyền gắn với đối tượng tệp/thư mục. Windows đối chiếu các mục cho phép/từ chối với token tiến trình. Full control trong một mục cấp quyền không xóa mọi mục từ chối, khóa chia sẻ hoặc cơ chế bảo vệ khác.
-
----
+</details>
 
 <a id="sau-chuong-hanh-vi"></a>
-## 4. Sáu chương hành vi
+
+## Sáu hành vi
 
 <a id="hanh-vi-1"></a>
-<details open>
-<summary><strong>Hành vi 1 — Nhánh mạng và kill switch</strong></summary>
+
+### Hành vi 1 — Nhánh mạng và kill switch
+
+Endpoint tới được: mẫu nhận dữ liệu rồi thoát; không tới được: chuỗi service/payload tiếp tục.
+
+<details>
+<summary>Quan sát, cơ chế và bằng chứng</summary>
 
 ### Quan sát
 
@@ -139,8 +94,13 @@ Khi responder cục bộ trả dữ liệu, mẫu thoát sạch. Khi endpoint kh
 </details>
 
 <a id="hanh-vi-2"></a>
+
+### Hành vi 2 — Dịch vụ Windows và persistence cấu hình
+
+Hai service Auto/LocalSystem được cấu hình; chưa thử thực thi sau reboot.
+
 <details>
-<summary><strong>Hành vi 2 — Dịch vụ Windows và persistence cấu hình</strong></summary>
+<summary>Quan sát, cơ chế và bằng chứng</summary>
 
 ### Quan sát
 
@@ -185,8 +145,13 @@ PID `5152` đi trước việc tạo `mssecsvc2.0`; SCM khởi chạy PID `5272`
 </details>
 
 <a id="hanh-vi-3"></a>
+
+### Hành vi 3 — Thả payload và chuỗi tiến trình
+
+Payload được thả rồi chạy qua SCM; quan hệ nhân quả không phải một cây PPID liền mạch.
+
 <details>
-<summary><strong>Hành vi 3 — Thả payload và chuỗi tiến trình</strong></summary>
+<summary>Quan sát, cơ chế và bằng chứng</summary>
 
 ### Quan sát
 
@@ -240,8 +205,13 @@ powershell.exe (4872)                services.exe / SCM (644)
 </details>
 
 <a id="hanh-vi-4"></a>
+
+### Hành vi 4 — `attrib` và `icacls`
+
+Hai utility thay thuộc tính Hidden và DACL trong working directory, không phải toàn máy.
+
 <details>
-<summary><strong>Hành vi 4 — <code>attrib</code> và <code>icacls</code></strong></summary>
+<summary>Quan sát, cơ chế và bằng chứng</summary>
 
 ### Quan sát
 
@@ -286,8 +256,13 @@ Hai utility được PID `3760` sinh ra ngay sau khi working directory/payload �
 </details>
 
 <a id="hanh-vi-5"></a>
+
+### Hành vi 5 — Biến đổi đúng ba tệp decoy
+
+Đúng ba decoy đổi path/hash, có header `WANACRY!`; chưa chứng minh thuật toán crypto cụ thể.
+
 <details>
-<summary><strong>Hành vi 5 — Biến đổi đúng ba tệp decoy</strong></summary>
+<summary>Quan sát, cơ chế và bằng chứng</summary>
 
 ### Quan sát
 
@@ -339,8 +314,13 @@ PID `3760` tạo `.WNCRYT`, ghi nhiều vùng, rename sang `.WNCRY`, rồi di ch
 </details>
 
 <a id="hanh-vi-6"></a>
+
+### Hành vi 6 — Ransom note, shortcut và GUI
+
+Ransom artifacts xuất hiện; GUI được quan sát sau capture, không chứng minh thanh toán hay giải mã.
+
 <details>
-<summary><strong>Hành vi 6 — Ransom note, shortcut và GUI</strong></summary>
+<summary>Quan sát, cơ chế và bằng chứng</summary>
 
 ### Quan sát
 
@@ -383,9 +363,100 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 
 </details>
 
----
+<a id="kiem-chung"></a>
+
+## Kiểm chứng và nguồn
+
+Mở phần cần đối chiếu; ảnh, bảng và log giữ nguyên phạm vi chứng cứ.
+
+<a id="ho-so"></a>
+
+<details>
+<summary>Hồ sơ mẫu và phạm vi xuất bản</summary>
+
+> **Cách đọc:** đọc mục 1 để nắm kết quả, mở từng chương để hiểu cơ chế, dùng timeline và nguồn để kiểm chứng. Markdown hỗ trợ mở/đóng nội dung bằng `<details>`; không chạy React/MDX hoặc live demo. Ảnh giữ nguyên các tệp PNG đã cung cấp, có khung VMware, không phải giao diện tương tác.
+
+- **Học phần / người thực hiện:** IAM302 — Nguyen Van Bach, DE200409.
+- **Mẫu:** `24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe`
+- **SHA-256:** `24D004A104D4D54034DBCFFC2A4B19A11F39008A575AA614EA04703480B1022C`
+- **Máy quan sát:** Windows 10 build `19044`, tài khoản thí nghiệm `DESKTOP-V5VC9B3\bachdeptrai`.
+- **Phạm vi:** hai lần chạy có kiểm soát ngày `2026-10-08` (UTC+7); Procmon, transcript PowerShell, log responder, chênh lệch service/task/Run key, Event ID 7045, Sysinternals Handle/ListDLLs và ba tệp decoy.
+
+> **Phạm vi xuất bản:** sửa `README.md` chỉ thay tài liệu trên Git repository/GitHub. SPA production hiện không có route hay renderer MD/MDX cho README; nội dung này không tự xuất hiện trong SPA nếu ứng dụng không được bổ sung chức năng đó.
+
+</details>
+
+<a id="muc-luc"></a>
+
+<details>
+<summary>Mục lục đầy đủ</summary>
+
+## Mục lục
+
+1. [Kết luận nhanh](#ket-luan-nhanh)
+2. [Cách đọc chứng cứ](#cach-doc-chung-cu)
+3. [Khái niệm và thiết kế phép thử](#khai-niem-va-thiet-ke)
+4. [Sáu chương hành vi](#sau-chuong-hanh-vi)
+   1. [Nhánh mạng và kill switch](#hanh-vi-1)
+   2. [Dịch vụ Windows và persistence cấu hình](#hanh-vi-2)
+   3. [Thả payload và chuỗi tiến trình](#hanh-vi-3)
+   4. [`attrib` và `icacls`](#hanh-vi-4)
+   5. [Biến đổi ba tệp decoy](#hanh-vi-5)
+   6. [Ransom note, shortcut và GUI](#hanh-vi-6)
+5. [Dòng thời gian đã hiệu chỉnh](#dong-thoi-gian)
+6. [Bảng tiến trình](#bang-tien-trinh)
+7. [Command tokens](#command-tokens)
+8. [IOC](#ioc)
+9. [MITRE ATT&CK](#mitre)
+10. [Biên kiểm toán](#bien-kiem-toan)
+11. [Chín câu hỏi học phần](#chin-cau-hoi)
+12. [Nguồn và liên kết tham khảo](#nguon-tham-khao)
+
+</details>
+
+<a id="cach-doc-chung-cu"></a>
+
+<details>
+<summary>Quy ước chứng cứ và CSV record</summary>
+
+## 2. Cách đọc chứng cứ
+
+| Nhãn | Ý nghĩa |
+|---|---|
+| **Quan sát** | Có trực tiếp trong file/log/ảnh được dẫn nguồn. |
+| **Diễn giải** | Ý nghĩa hợp lý của quan sát, vẫn tách khỏi dữ kiện gốc. |
+| **Cơ chế** | Windows xử lý thao tác như thế nào; không đồng nghĩa đã hook được API. |
+| **Liên kết nhân quả** | Chuỗi thời gian, parent/child, file path hoặc cấu hình service nối các sự kiện. |
+| **Giới hạn** | Điều dữ liệu hiện có không chứng minh. |
+
+**Quy ước record:** mọi số `R...` trong báo cáo này là **1-based data record index, không tính dòng header**, được đọc bằng `csv.DictReader`. Quy ước này đã hiệu chỉnh sai lệch +1 trong một số báo cáo trung gian. Trường CSV có newline nhúng; không dùng số dòng vật lý của file văn bản làm record index.
+
+</details>
+
+<a id="khai-niem-va-thiet-ke"></a>
+
+<details>
+<summary>Khái niệm và thiết kế phép thử</summary>
+
+## 3. Khái niệm và thiết kế phép thử
+
+- **Kill switch:** điều kiện môi trường khiến chương trình ngừng hoặc tiếp tục. Trong phép thử, domain `www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com` được ánh xạ về loopback. Đây không phải C2 đã xác nhận.
+- **Dropper/payload:** tiến trình ban đầu ghi thành phần khác xuống đĩa rồi kích hoạt chúng. Tên switch `-m security` và `/i` được quan sát như token dòng lệnh; ý nghĩa nội bộ của từng switch chưa được chứng minh bằng hook API hoặc dịch ngược trong bộ chứng cứ này.
+- **Persistence cấu hình:** service có `Start=2`/Auto tạo điều kiện chạy khi boot. Khả năng sống sót và chạy thành công sau reboot chỉ được xác nhận bằng một phép thử reboot; phép thử đó **không được thực hiện**.
+- **Decoy:** ba tệp thử nghiệm có hash baseline, đặt tại `C:\Users\bachdeptrai\Documents\IAM302_Decoys_20261008`. Chúng cho phép kết luận hẹp, kiểm chứng được.
+- **Attribution:** một bản ghi được gán vào chuỗi hành vi dựa trên PID, parent, command line và cầu nối SCM. “Attributed” không biến mọi executable Windows trong chuỗi thành malware binary.
+- **Ảnh chụp:** ảnh hỗ trợ bối cảnh nhìn thấy. CSV/log/hash là nguồn định lượng. Ảnh không thay thế sự kiện thô.
+- **Service và chương trình thông thường:** chương trình thường được người dùng mở trong phiên đăng nhập; service có cấu hình và vòng đời do SCM quản lý, có thể chạy khi chưa có người đăng nhập. `services.exe` là tiến trình quản lý dịch vụ, không phải bản thân payload.
+- **LocalSystem:** tài khoản dịch vụ có đặc quyền cao trên máy cục bộ. Thấy token SYSTEM giải thích phạm vi quyền thực thi, không chứng minh mọi tệp đều truy cập được. Tạo service cần quyền thích hợp đối với SCM; đăng ký service không tự vượt qua kiểm soát quyền.
+- **DACL và ACL:** danh sách quyền gắn với đối tượng tệp/thư mục. Windows đối chiếu các mục cho phép/từ chối với token tiến trình. Full control trong một mục cấp quyền không xóa mọi mục từ chối, khóa chia sẻ hoặc cơ chế bảo vệ khác.
+
+</details>
 
 <a id="dong-thoi-gian"></a>
+
+<details>
+<summary>Dòng thời gian đã hiệu chỉnh</summary>
+
 ## 5. Dòng thời gian đã hiệu chỉnh
 
 | Thời gian cục bộ | Kịch bản/record | Sự kiện quan sát |
@@ -412,9 +483,13 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 | `11:58:47.7389115` | B capture end | Kết thúc cửa sổ CSV; PID `3760/5272` còn qua cuối trace. |
 | `12:00:10` | log muộn | PID `1752` GUI xuất hiện sau capture. |
 
----
+</details>
 
 <a id="bang-tien-trinh"></a>
+
+<details>
+<summary>15 tiến trình được quy thuộc</summary>
+
 ## 6. Bảng 15 tiến trình được quy thuộc trong capture B
 
 | PID | Image/command quan sát | PPID | Bản ghi | Vai trò chứng cứ hẹp |
@@ -438,9 +513,13 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 
 `services.exe` PID `644` là broker OS, không nằm trong tập 15; analyst tools cũng bị loại. `271,958` là số record quy thuộc cho lineage, không phải số “hành vi độc hại” độc lập.
 
----
+</details>
 
 <a id="command-tokens"></a>
+
+<details>
+<summary>Command tokens</summary>
+
 ## 7. Command tokens quan sát được
 
 | Command/token | Điều chứng minh được | Điều không được suy diễn |
@@ -453,9 +532,13 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 | `cmd.exe /c 116221791435459.bat` | Chạy batch được quan sát. | Nội dung mọi nhánh batch nếu chưa đối chiếu file. |
 | `cscript.exe //nologo m.vbs` | Chạy VBS không banner. | Mọi API hoặc mục đích bên trong script. |
 
----
+</details>
 
 <a id="ioc"></a>
+
+<details>
+<summary>IOC có căn cứ</summary>
+
 ## 8. Chỉ số xâm phạm (IOC) có căn cứ
 
 | Loại | Giá trị | Phạm vi/ghi chú |
@@ -471,9 +554,13 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 | Ransom files | `@Please_Read_Me@.txt`; `@WanaDecryptor@.exe`; `.lnk` | File/artifact quan sát được. |
 | Bitcoin address | `115p7UMMngoj1pMvkpHijcRdfJNXj6LrLn` | Trích từ ransom note/GUI; ownership chưa xác minh. |
 
----
+</details>
 
 <a id="mitre"></a>
+
+<details>
+<summary>Đối chiếu MITRE ATT&CK</summary>
+
 ## 9. Đối chiếu MITRE ATT&CK có kiểm soát
 
 | Technique | Mapping | Bằng chứng tại chỗ | Mức tin cậy |
@@ -488,13 +575,14 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 
 **Không map trong báo cáo:** T1490 từ `icacls`; T1027 từ `attrib`; C2/Web Protocol từ một kill-switch request; UAC bypass từ SCM; SMB propagation khi không có traffic SMB quan sát được. `T1204.002 User Execution` là hành động harness trong thí nghiệm, không phải kỹ thuật adversary được chứng minh ở đây.
 
----
+</details>
 
 <a id="bien-kiem-toan"></a>
-## 10. Biên kiểm toán và độ tin cậy
 
 <details>
-<summary><strong>Mở danh sách đầy đủ</strong></summary>
+<summary>Biên kiểm toán và độ tin cậy</summary>
+
+## 10. Biên kiểm toán và độ tin cậy
 
 1. `verification.log` đã pass 5 nhóm: checksum artifact; record count `1,710/309,281`; ba hash A; ba header/hash B; 15 PID và tổng `271,958`.
 2. Procmon CSV chứa metadata I/O, không chứa raw bytes. Header và SHA-256 lấy từ file artifact riêng.
@@ -512,9 +600,11 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 
 </details>
 
----
-
 <a id="chin-cau-hoi"></a>
+
+<details>
+<summary>Chín câu hỏi học phần</summary>
+
 ## 11. Trả lời chín câu hỏi học phần
 
 1. **Hành vi ngay sau thực thi?**
@@ -544,9 +634,13 @@ Các process trong capture là hậu duệ của PID `3760`; file note/shortcut 
 9. **MITRE ATT&CK nào được hỗ trợ?**
    T1543.003, T1486, T1564.001, T1222.001, T1059.003, T1059.005; T1036.004 ở mức trung bình. Các mapping bị loại được nêu rõ tại [mục 9](#mitre).
 
----
+</details>
 
 <a id="nguon-tham-khao"></a>
+
+<details>
+<summary>Nguồn, lệnh tái kiểm tra và tài liệu chuẩn</summary>
+
 ## 12. Nguồn và liên kết tham khảo
 
 ### Hồ sơ kiểm toán cục bộ
@@ -585,3 +679,5 @@ Kết quả mong đợi: `STATUS: OK`. Để kiểm tra một record được d�
 ---
 
 **Trạng thái xác minh:** `verification.log` kết thúc bằng `ALL FORENSIC CHECKS PASSED SUCCESSFULLY (STATUS: OK)`. Trạng thái đó xác nhận checksum/count/hash/PID đã kiểm tra; không mở rộng phạm vi vượt quá các giới hạn ở [mục 10](#bien-kiem-toan).
+
+</details>

@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite';
+import mdx from '@mdx-js/rollup';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    { enforce: 'pre', ...mdx() },
+    react({ include: /\.(jsx|js|mdx|md|ts|tsx)$/ })
+  ],
   server: {
     port: 3000
   }
