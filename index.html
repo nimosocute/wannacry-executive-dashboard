@@ -29,7 +29,7 @@
   </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
-  <header class="glass sticky top-0 z-40 border-b border-zinc-800/80 px-6 py-3.5">
+  <header class="glass sticky top-0 z-40 border-b border-zinc-800/80 px-6 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-amber-600 flex items-center justify-center shadow-lg shadow-red-900/30">
@@ -40,27 +40,37 @@
             <h1 class="text-base font-bold tracking-tight text-white">WannaCry Behavioral Intelligence</h1>
             <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Lab Verified</span>
           </div>
-          <p class="text-xs text-zinc-400">Học phần IAM302 &bull; Giám sát viên: Nguyen Van Bach (DE200409)</p>
+          <p class="text-xs text-zinc-400">IAM302 &bull; Progressive Depth Architecture &bull; Nguyen Van Bach (DE200409)</p>
         </div>
       </div>
-      <div class="flex items-center gap-2.5">
+
+      <!-- Progressive Depth Mode Switcher -->
+      <div class="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-900/90 border border-zinc-800 text-xs font-semibold">
+        <button onclick="scrollToSection('executive')" class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 text-zinc-300 transition flex items-center gap-1.5">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> 30 Giây (Sếp)
+        </button>
+        <button onclick="scrollToSection('mechanisms')" class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 text-zinc-300 transition flex items-center gap-1.5">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-400"></i> Giải thích Cơ chế
+        </button>
+        <button onclick="scrollToSection('academic')" class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 text-zinc-300 transition flex items-center gap-1.5">
+          <i data-lucide="microscope" class="w-3.5 h-3.5 text-emerald-400"></i> Chuyên sâu (15 Rubric)
+        </button>
+        <button onclick="scrollToSection('gallery')" class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 text-zinc-300 transition flex items-center gap-1.5">
+          <i data-lucide="layers" class="w-3.5 h-3.5 text-purple-400"></i> Kho Bằng chứng
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
         <a href="https://github.com/nimosocute/wannacry-executive-dashboard" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold text-zinc-200 transition inline-flex items-center gap-1.5 shadow-sm">
           <i data-lucide="github" class="w-4 h-4 text-white"></i> GitHub Repo
         </a>
-        <a href="https://github.com/nimosocute/wannacry-executive-dashboard#ph%E1%BA%A7n-ii-b%C3%A1o-c%C3%A1o-k%E1%BB%B9-thu%E1%BA%ADt-to%C3%A0n-di%E1%BB%87n-full-technical-report" target="_blank" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-bold text-amber-400 transition inline-flex items-center gap-1.5 shadow-sm">
-          <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i> Full Report (.md)
-        </a>
-        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Môi trường: Win10 Isolated
-        </div>
       </div>
     </div>
   </header>
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
     <!-- SECTION 1: TL;DR EXECUTIVE SUMMARY -->
-    <section class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800/80 shadow-2xl relative overflow-hidden">
+    <section id="executive" class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800/80 shadow-2xl relative overflow-hidden">
       <div class="absolute -right-16 -top-16 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-zinc-800/80">
         <div>
@@ -170,6 +180,193 @@
         </div>
       </div>
     </section>
+
+    
+    <!-- SECTION: 6-STEP BEHAVIORAL MECHANISMS & CONTEXTUAL EVIDENCE -->
+    <section class="space-y-6" id="mechanisms">
+      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 relative overflow-hidden">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-semibold mb-2">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Kiến Trúc Thông Tin & Trải Nghiệm Học Tập
+        </div>
+        <h2 class="text-2xl font-extrabold tracking-tight text-white">
+          Giải Thích Cơ Chế Nguyên Nhân – Kết Quả (6 Bước Chuẩn)
+        </h2>
+        <p class="text-xs text-zinc-400 max-w-3xl mt-1 leading-relaxed">
+          Không chỉ dừng ở câu hỏi "Kết quả là gì?", phần này giải thích sâu "Xảy ra bằng cách nào?", "Lệnh đó có tác dụng gì?", "Liên kết bước trước ra sao?" và "Bằng chứng tại chỗ chứng minh được điều gì và chưa chứng minh được điều gì?".
+        </p>
+      </div>
+
+      <!-- BEHAVIOR CARD 1: KILL SWITCH -->
+      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">Hành Vi 01 &bull; Network Branching</span>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
+              Cơ Chế Công Tắc Hủy (Kill-Switch) & Rẽ Nhánh Thực Thi
+            </h3>
+          </div>
+          <span class="text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            HTTP 200 OK &rarr; Exit Code 0
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-7 space-y-4 text-xs text-zinc-300">
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-amber-400 uppercase text-[10px] tracking-wider block mb-1">Bước 1 &bull; Khái niệm & Mục đích</span>
+              <p>Kill-switch là điều kiện rẽ nhánh do tác giả cài đặt vào mã độc, được nhận định ban đầu dùng như kỹ thuật <strong>Anti-Analysis / Sandbox Evasion</strong> (trong máy ảo tự động phân tích, mọi kết nối mạng đều bị chặn hoặc giả lập trả lời 200 OK, khiến mã độc nghĩ mình đang bị theo dõi nên tự tắt để giấu payload).</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-blue-400 uppercase text-[10px] tracking-wider block mb-1">Bước 2 &bull; Logic Rẽ Nhánh Hệ Thống</span>
+              <p class="font-mono bg-zinc-950 p-2.5 rounded border border-zinc-800 text-[11px] text-zinc-200">
+                Gửi GET / tới tên miền kill-switch<br>
+                &boxur;&HorizontalLine; NẾU Có phản hồi (HTTP 200) &rarr; ExitProcess(0) trong 0.89s (Kịch bản A)<br>
+                &boxur;&HorizontalLine; NẾU Mất mạng / Lỗi kết nối &rarr; Bắt đầu chuỗi mã hóa tống tiền (Kịch bản B)
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-emerald-400 uppercase text-[10px] tracking-wider block mb-1">Bước 3 &bull; Kết luận & Giới hạn Nhận định</span>
+              <p><strong>Chứng minh được:</strong> Mã độc có sự phụ thuộc hoàn toàn vào phản hồi mạng này trước khi tiếp tục chuỗi tấn công.<br>
+              <strong>Giới hạn:</strong> Kill-switch không phải lỗ hổng Windows; việc tiến trình thoát mã 0 không chứng minh mã độc đã bị xóa khỏi đĩa cứng hay hệ thống đã an toàn tuyệt đối.</p>
+            </div>
+          </div>
+
+          <!-- Contextual Evidence Card -->
+          <div class="lg:col-span-5 space-y-2">
+            <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 group">
+              <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('screenshots/A_burp_item4_host_verified_vmware.png', 'Bằng chứng Burp Suite Item #4')">
+                <img src="screenshots/A_burp_item4_host_verified_vmware.png" alt="Burp Item 4" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" />
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
+                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  Bằng chứng tại chỗ: Burp Suite Pro
+                </span>
+                <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
+                  <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="p-3 bg-zinc-900/40 border-t border-zinc-800 text-[11px] text-zinc-400">
+                <strong class="text-zinc-200">Vùng quan sát:</strong> Item #4 lúc 11:44:17. Gói tin HTTP 200 OK (155 bytes) chặn đứng đợt tấn công từ PID 6520.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEHAVIOR CARD 2: SERVICE PERSISTENCE -->
+      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-red-400 tracking-wider">Hành Vi 02 &bull; System Persistence</span>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
+              Đăng Ký Dịch Vụ Windows Ngầm (mssecsvc2.0 Quyền SYSTEM)
+            </h3>
+          </div>
+          <span class="text-xs font-mono px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+            Start Type = Auto Start (2)
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-7 space-y-4 text-xs text-zinc-300">
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-amber-400 uppercase text-[10px] tracking-wider block mb-1">1. Quan sát & Lệnh thực thi</span>
+              <p>Mã độc tự động đăng ký dịch vụ mới tên <code>mssecsvc2.0</code> (ngụy trang <em>Microsoft Security Center (2.0) Service</em>) thực thi lệnh:<br>
+              <code class="text-amber-400 font-mono">C:\LabLive\Sample_readyd004a...exe -m security</code></p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-blue-400 uppercase text-[10px] tracking-wider block mb-1">2. Cơ chế Hệ điều hành Windows</span>
+              <p>Được ghi trực tiếp vào <code>HKLM\SYSTEM\CurrentControlSet\Services\mssecsvc2.0</code> dưới quyền <strong>LocalSystem</strong> với <code>Start = 2</code>. Cơ chế Service Manager sẽ tự động nạp tiến trình này khi máy tính vừa bật nguồn, trước khi bất kỳ người dùng nào đăng nhập.</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-emerald-400 uppercase text-[10px] tracking-wider block mb-1">3. Kết luận & Giới hạn</span>
+              <p><strong>Chứng minh được:</strong> Khởi động lại máy tính (Reboot) không thể làm sạch mã độc; dịch vụ sẽ tự kích hoạt lại ngay lập tức.<br>
+              <strong>Giới hạn:</strong> Do lab bị cô lập card mạng vật lý, nhánh quét mạng SMB port 445 của service này không phát tán sang máy khác được.</p>
+            </div>
+          </div>
+
+          <!-- Contextual Evidence Card -->
+          <div class="lg:col-span-5 space-y-2">
+            <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 group">
+              <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('screenshots/B_service_mssecsvc_properties_vmware.png', 'Process Hacker: Thuộc tính Service mssecsvc2.0')">
+                <img src="screenshots/B_service_mssecsvc_properties_vmware.png" alt="Service Properties" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" />
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
+                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  Bằng chứng: Process Hacker & Service Manager
+                </span>
+                <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
+                  <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="p-3 bg-zinc-900/40 border-t border-zinc-800 text-[11px] text-zinc-400">
+                <strong class="text-zinc-200">Vùng quan sát:</strong> Binary Path chứa cờ <code>-m security</code>; Service Account: <code>LocalSystem</code>; Start Type: <code>Auto start</code>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEHAVIOR CARD 3: FILE ENCRYPTION PROCESS -->
+      <div class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-red-400 tracking-wider">Hành Vi 03 &bull; File System Modification</span>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-0.5">
+              Quy Trình Mã Hóa Tệp Mồi Decoys & Header Nhị Phân WANACRY!
+            </h3>
+          </div>
+          <span class="text-xs font-mono px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+            SetRenameInformationFile (.WNCRY)
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-7 space-y-4 text-xs text-zinc-300">
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-amber-400 uppercase text-[10px] tracking-wider block mb-1">1. Phân biệt Trọng yếu (Methodology)</span>
+              <p>Cần phân biệt rõ: <strong>Quan sát thấy tệp bị đổi tên / gắn header</strong> hoàn toàn khác với <strong>Chứng minh thuật toán & quy trình sinh khóa</strong>. Qua phân tích động (Dynamic), ta xác minh được vòng đời của tệp tin; còn cấu trúc khóa AES-128 / RSA-2048 phải kiểm chứng qua các thư viện CryptoAPI được nạp (<code>rsaenh.dll</code>, <code>CRYPTSP.dll</code>).</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-blue-400 uppercase text-[10px] tracking-wider block mb-1">2. Vòng Đời Tệp Tin (File Lifecycle)</span>
+              <p>Mã độc không ghi đè trực tiếp lên file gốc mà thực hiện 4 bước liên hoàn:<br>
+              1. Đọc nội dung tệp gốc (<code>inventory.csv</code>).<br>
+              2. Mã hóa dữ liệu trong bộ nhớ qua Windows CryptoAPI.<br>
+              3. Ghi ra tệp tạm <code>inventory.csv.WNCRYT</code> chứa header <code>WANACRY!</code>.<br>
+              4. Xóa tệp gốc và đổi tên tệp tạm thành <code>inventory.csv.WNCRY</code>.</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="font-bold text-emerald-400 uppercase text-[10px] tracking-wider block mb-1">3. Kết luận Thực nghiệm</span>
+              <p>Toàn bộ 3 tệp mồi trong thư mục Decoys bị mã hóa thành công sau 12 mili-giây. Kích thước tệp tăng lên để chứa thêm metadata header khóa mã hóa.</p>
+            </div>
+          </div>
+
+          <!-- Contextual Evidence Card -->
+          <div class="lg:col-span-5 space-y-2">
+            <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 group">
+              <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('screenshots/B_procmon_rename_properties_vmware.png', 'Procmon: Sự kiện đổi tên tệp WNCRY')">
+                <img src="screenshots/B_procmon_rename_properties_vmware.png" alt="Procmon Rename Properties" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" />
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
+                <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                  Bằng chứng: Process Monitor
+                </span>
+                <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
+                  <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="p-3 bg-zinc-900/40 border-t border-zinc-800 text-[11px] text-zinc-400">
+                <strong class="text-zinc-200">Vùng quan sát:</strong> Event <code>SetRenameInformationFile</code> của PID 3760 (tasksche.exe) đổi tên từ `.WNCRYT` sang `.WNCRY`.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
 
     <!-- SECTION 3: PROCESS LINEAGE EXPLORER (SCENARIO B) -->
     <section id="processExplorer" class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6">

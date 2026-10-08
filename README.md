@@ -1,41 +1,238 @@
-# 🛡️ BÁO CÁO ĐIỀU HÀNH & KỸ THUẬT: PHÂN TÍCH HÀNH VI RANSOMWARE WANNACRY
-> **Tài liệu toàn diện: Tóm tắt 30 giây cho Ban Lãnh đạo (TL;DR) & Báo cáo Kỹ thuật 15 Yêu cầu**  
-> *Được thực hiện qua phân tích động cô lập trên môi trường lab thực tế bởi: Nguyen Van Bach (DE200409)*
+# 🛡️ BÁO CÁO PHÂN TÍCH HÀNH VI MÃ ĐỘC WANNACRY: KIẾN TRÚC THÔNG TIN & CƠ CHẾ NGUYÊN NHÂN – KẾT QUẢ
+> **Mô hình Trình bày Chiều sâu Tăng dần (Progressive Depth Architecture):**  
+> ⚡ **Cấp độ 1:** Bản tóm tắt điều hành 30 giây (Executive Briefing — Dành cho Boss/Lãnh đạo)  
+> 💡 **Cấp độ 2:** Giải thích cơ chế nguyên nhân – kết quả & Contextual Evidence (Dành cho Học tập & Đào tạo)  
+> 🔬 **Cấp độ 3:** Báo cáo kỹ thuật chuyên sâu & Kiểm toán thực nghiệm (15 Yêu cầu Học phần IAM302)  
+> 📦 **Cấp độ 4:** Kho bằng chứng số độc lập (Evidence Repository)
 
-[![Live Demo](https://img.shields.io/badge/Vercel-Live_Dashboard-blue?style=for-the-badge&logo=vercel)](https://wannacry-executive-dashboard.vercel.app)
-[![Status](https://img.shields.io/badge/Security_Status-ANALYZED-success?style=for-the-badge)](https://github.com/nimosocute/wannacry-executive-dashboard)
+[![Live Dashboard](https://img.shields.io/badge/Vercel-Live_Dashboard-blue?style=for-the-badge&logo=vercel)](https://wannacry-executive-dashboard.vercel.app)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-darkgreen?style=for-the-badge&logo=github)](https://github.com/nimosocute/wannacry-executive-dashboard)
 [![Threat Level](https://img.shields.io/badge/Threat_Level-CRITICAL-red?style=for-the-badge)](https://attack.mitre.org)
 [![Course](https://img.shields.io/badge/Course-IAM302_Advanced_Malware_Analysis-orange?style=for-the-badge)](https://fpt.edu.vn)
 
 ---
 
-## ⚡ PHẦN I: TÓM TẮT ĐIỀU HÀNH (EXECUTIVE BRIEFING — ĐỌC TRONG 30 GIÂY)
-*Dành cho Ban Giám đốc và Lãnh đạo không chuyên kỹ thuật (Non-technical / TL;DR Friendly).*
+## ⚡ CẤP ĐỘ 1: BẢN TÓM TẮT ĐIỀU HÀNH (EXECUTIVE BRIEFING — ĐỌC TRONG 30 GIÂY)
+*Tối ưu cho Lãnh đạo cần nắm bắt bức tranh toàn cảnh, mức độ rủi ro và các quyết định cần phê duyệt ngay.*
 
-| Chỉ số rủi ro | Kịch bản A (Có công tắc hủy) | Kịch bản B (Bị tấn công thực tế) | Ý nghĩa đối với Doanh nghiệp |
+### 1. Bảng So Sánh Hai Kịch Bản Rủi Ro
+| Chỉ số rủi ro | Kịch bản A (Có Công tắc Hủy) | Kịch bản B (Bị Tấn công Thực tế) | Ý nghĩa đối với Doanh nghiệp |
 | :--- | :---: | :---: | :--- |
-| **Tình trạng hệ thống** | 🟢 **AN TOÀN 100%** | 🔴 **TÊ LIỆT TOÀN BỘ** | Mã độc có tính năng tự hủy nếu đáp ứng điều kiện mạng. |
-| **Thời gian phá hoại** | `0.89 giây` (Tự tắt) | `< 3.0 giây` (Mã hóa xong) | Tốc độ lây lan cực nhanh, con người không kịp trở tay. |
-| **Thiệt hại tài chính** | **0 USD** | **$300 USD / máy** (bằng Bitcoin) | Sẽ tăng gấp đôi ($600) sau 3 ngày; mất dữ liệu vĩnh viễn sau 7 ngày. |
-| **Tệp dữ liệu bị khóa** | **0%** (Tệp nguyên vẹn) | **100%** (Đổi đuôi `.WNCRY`) | Mất toàn bộ tài liệu Word, Excel, hợp đồng, kế toán. |
-| **Tự khởi động ngầm** | ❌ Không | ⚠️ **2 Dịch vụ Windows bí mật** | Khởi động lại máy tính vẫn tiếp tục bị nhiễm mã độc. |
+| **Trạng thái Hệ thống** | 🟢 **AN TOÀN 100%** | 🔴 **TÊ LIỆT TOÀN BỘ** | Mã độc có điều kiện tự hủy nếu đáp ứng môi trường mạng. |
+| **Thời gian Phá hoại** | `0.89 giây` (Tự thoát sạch) | `< 3.0 giây` (Mã hóa xong) | Tốc độ lây lan và phá hủy cực nhanh, không thể can thiệp thủ công. |
+| **Thiệt hại Tài chính** | **0 USD** | **$300 USD / máy** (bằng Bitcoin) | Tăng gấp đôi ($600) sau 3 ngày; mất dữ liệu vĩnh viễn sau 7 ngày. |
+| **Dữ liệu Người dùng** | **Nguyên vẹn 100%** | **Mã hóa toàn bộ** (`.WNCRY`) | Toàn bộ tài liệu Word, Excel, Database, hợp đồng bị khóa. |
+| **Duy trì Sau Reboot** | ❌ Không | ⚠️ **2 Dịch vụ Windows chạy ngầm** | Khởi động lại máy tính vẫn tiếp tục kích hoạt ransomware. |
 
-### 📌 Điểm mấu chốt sếp cần biết:
+### 2. Điểm Mấu Chốt Lãnh Đạo Cần Nắm
 1. **WannaCry là gì?** Là mã độc tống tiền tự động. Khi lọt vào máy tính, nó âm thầm khóa toàn bộ tài liệu quan trọng và đòi tiền chuộc 300$ bằng Bitcoin để mở khóa.
 2. **"Công tắc hủy" (Kill-Switch) thần kỳ:** Trước khi phá hoại, mã độc sẽ bí mật gửi yêu cầu HTTP kiểm tra một tên miền bí mật.
    - Nếu tên miền này **có phản hồi HTTP 200 OK**: Mã độc nhận định môi trường đang bị chuyên gia bảo mật phân tích -> **Nó lập tức tự hủy và thoát trong 0.89 giây** (Kịch bản A).
    - Nếu tên miền **không phản hồi (mất mạng)**: Nó lập tức kích hoạt bộ máy phá hủy, khóa sạch dữ liệu và thay hình nền tống tiền (Kịch bản B).
-3. **Bài học sống còn cho công ty:** Không chặn bừa bãi tên miền kill-switch nội bộ, và phải vá lỗ hổng Windows ngay lập tức.
+3. **Bài học sống còn:** Không chặn bừa bãi tên miền kill-switch trên DNS nội bộ, và phải vá lỗ hổng Windows ngay lập tức.
 
-### 🎯 Ba Hành Động Đề Xuất Cho Ban Giám Đốc (Action Items)
-- [x] **Hành động 1 (Khẩn cấp):** Phê duyệt cho bộ phận IT rà soát và cài đặt ngay bản vá **MS17-010** trên toàn bộ máy tính Windows trong công ty.
-- [x] **Hành động 2:** Khóa cổng chia sẻ file nội bộ (`SMB Port 445`) không cho phép truy cập trực tiếp từ Internet vào mạng công ty.
-- [x] **Hành động 3:** Cấu hình sao lưu (Backup) dữ liệu quan trọng ra ổ cứng rời / đám mây độc lập định kỳ hàng tuần (Quy tắc 3-2-1).
+### 3. Ba Hành Động Đề Xuất Cho Ban Giám Đốc (Action Items)
+- [x] **Hành động 1 (Khẩn cấp):** Phê duyệt cho IT quét và cập nhật bản vá **MS17-010** trên 100% máy trạm và máy chủ Windows.
+- [x] **Hành động 2:** Khóa toàn bộ cổng chia sẻ file nội bộ (`SMB Port 445`) không cho phép truy cập từ Internet vào mạng công ty.
+- [x] **Hành động 3:** Thiết lập sao lưu dữ liệu độc lập định kỳ (Quy tắc 3-2-1: 3 bản sao, 2 loại thiết bị lưu trữ, 1 bản đặt offsite/cloud).
 
 ---
 
-## 🔬 PHẦN II: BÁO CÁO KỸ THUẬT TOÀN DIỆN (FULL TECHNICAL REPORT)
-*Dành cho Trưởng phòng Bảo mật, Chuyên viên SOC và Hội đồng Chấm thi (Đáp ứng đầy đủ 15 Yêu cầu thực hành bổ sung).*
+## 💡 CẤP ĐỘ 2: GIẢI THÍCH NGUYÊN NHÂN – KẾT QUẢ & CƠ CHẾ HOẠT ĐỘNG (LEARNING & CONTEXTUAL EVIDENCE)
+*Tối ưu cho người học và chuyên viên phân tích muốn hiểu sâu: Tại sao lại xảy ra? Lệnh này làm gì? Liên kết bước trước ra sao? Bằng chứng chứng minh được gì và chưa chứng minh được gì?*
+
+Mỗi hành vi dưới đây được mổ xẻ theo **Khuôn Mẫu Phân Tích 6 Bước Chuẩn Mực**:
+1. **Quan sát (Observation):** Đã thấy sự kiện, tiến trình hoặc lệnh nào?
+2. **Giải nghĩa (Syntax & Semantics):** Lệnh, tham số và đối tượng tác động là gì?
+3. **Cơ chế (OS Internals):** Hệ điều hành Windows xử lý hành vi đó như thế nào?
+4. **Mối liên hệ (Causal Linkage):** Nối với bước trước và bước sau ra sao?
+5. **Bằng chứng tại chỗ (Contextual Evidence):** Ảnh chụp và dòng log kiểm chứng trực tiếp.
+6. **Kết luận & Giới hạn (Deduction & Boundaries):** Chứng minh được gì và chưa chứng minh được gì?
+
+---
+
+### PHÂN TÍCH HÀNH VI 01 — CƠ CHẾ CÔNG TẮC HỦY (KILL-SWITCH & NETWORK BRANCHING)
+
+#### 1. Khái niệm & Tại sao lại tồn tại?
+Kill-switch là một điều kiện rẽ nhánh logic được tác giả cài đặt vào mã độc. Nhiều nhà nghiên cứu nhận định tính năng này ban đầu được dùng như cơ chế chống sandbox/máy ảo phân tích (Anti-Analysis): trong môi trường lab tự động, các công cụ phân tích thường giả lập mọi yêu cầu mạng trả về thành công (HTTP 200 OK), khiến mã độc lầm tưởng nó đang bị theo dõi và lập tức tự kết thúc để giấu hành vi.
+
+#### 2. Sơ đồ Rẽ nhánh Nguyên nhân – Kết quả
+```text
+[Khởi chạy Mẫu ban đầu (PID 6520 hoặc PID 5152)]
+                   │
+                   ▼
+       Gửi HTTP GET / tới tên miền:
+   www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com
+                   │
+         ┌─────────┴─────────┐
+         ▼                   ▼
+   [HTTP 200 OK]      [Không phản hồi / Refused]
+         │                   │
+         ▼                   ▼
+   [KỊCH BẢN A]         [KỊCH BẢN B]
+Tiến trình gọi ExitProcess(0)    Bắt đầu cài đặt Service ngầm
+Tự thoát sạch sau 0.89 giây     Thả payload & Mã hóa dữ liệu
+Hệ thống an toàn 100%          Tê liệt hoàn toàn & Đòi 300$
+```
+
+#### 3. Bằng chứng tại chỗ (Contextual Evidence)
+![Bằng chứng Burp Suite Item #4](screenshots/A_burp_item4_host_verified_vmware.png)
+- **Vị trí quan sát:** Giao diện HTTP History của Burp Suite Professional (Dòng Item #4, thời điểm `11:44:17`).
+- **Nội dung bắt được:** 
+  + Request: `GET / HTTP/1.1`, Host: `www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com`.
+  + Response: `HTTP/1.1 200 OK`, Server: MockHTTP, Length: 155 bytes.
+- **Tiến trình gửi:** PID `6520` (Xác minh qua Procmon `A_200.csv` bản ghi 462–476).
+
+![Procmon Kịch bản A: Thoát sạch mã 0](screenshots/A_run_direct_launch_1143_vmware.png)
+- **Vị trí quan sát:** Procmon Process Exit event lúc `11:44:17.839`.
+- **Kết quả:** `Exit Status: 0`, thời gian sống tổng cộng: `0.8922 giây`.
+
+#### 4. Kết luận & Giới hạn nhận định
+- **Chứng minh được:** Mã độc có phụ thuộc hoàn toàn vào phản hồi mạng từ URL trên. Khi nhận HTTP 200 OK, nó không sinh thêm bất kỳ tiến trình nào, không sửa file, không ghi registry phá hoại.
+- **Giới hạn nhận định:** Ảnh gói tin HTTP chỉ chứng minh mã độc dừng lại trong phiên chạy đó; nó **không** chứng minh bản thân mẫu mã độc bị xóa khỏi đĩa cứng hay lỗ hổng hệ thống đã được vá.
+
+---
+
+### PHÂN TÍCH HÀNH VI 02 — CƠ CHẾ DUY TRÌ BẰNG DỊCH VỤ WINDOWS (SERVICE PERSISTENCE)
+
+#### 1. Khái niệm & Mục đích của Dịch vụ ngầm
+Thay vì dùng khóa `Run` trong Registry dễ bị Antivirus quét, WannaCry sử dụng API của Windows Service Control Manager (SCM) để đăng ký dịch vụ hệ thống chạy dưới tài khoản quyền lực nhất: `NT AUTHORITY\SYSTEM`.
+
+#### 2. Phân tích 6 bước chi tiết
+1. **Quan sát:** Xuất hiện dịch vụ mới mang tên `mssecsvc2.0` (Display Name: `Microsoft Security Center (2.0) Service`) và `evmdthrukdvwcqn063`.
+2. **Giải nghĩa lệnh & tham số:** 
+   - Dịch vụ gọi binary: `C:\LabLive\Sample_readyd004a...exe -m security`.
+   - Cờ `-m security`: Báo hiệu cho mã độc chạy dưới chế độ Service Worker, không hiển thị GUI và khởi động mô-đun quét mạng lây lan SMB.
+3. **Cơ chế HĐH (OS Internals):** Hệ điều hành lưu cấu hình tại `HKLM\SYSTEM\CurrentControlSet\Services\mssecsvc2.0`. Thuộc tính `Start = 2` tương ứng với `SERVICE_AUTO_START`, nghĩa là Service Manager sẽ tự động nạp tiến trình này mỗi khi máy tính bật nguồn trước cả khi người dùng đăng nhập.
+4. **Mối liên hệ:** Sự kiện này xảy ra ngay sau khi kết nối mạng tới kill-switch thất bại 4 lần. Dịch vụ này đóng vai trò máy chủ điều phối cấp cao để sinh ra tiến trình thả payload `tasksche.exe`.
+5. **Bằng chứng tại chỗ:**
+
+![Process Hacker: Dịch vụ mssecsvc2.0 đang chạy](screenshots/B_service_mssecsvc_selected_vmware.png)
+*Chú thích: Process Hacker tab Services hiển thị mssecsvc2.0 ở trạng thái Running, PID 5272, Start type Auto.*
+
+![Process Hacker: Thuộc tính dịch vụ mssecsvc2.0](screenshots/B_service_mssecsvc_properties_vmware.png)
+*Chú thích: Thuộc tính Service Account xác minh tài khoản LocalSystem, binary path trỏ tới mẫu độc kèm cờ `-m security`.*
+
+6. **Kết luận & Giới hạn:**
+   - **Chứng minh được:** Nếu máy tính khởi động lại (Reboot), dịch vụ `mssecsvc2.0` sẽ tự động chạy lại với đặc quyền SYSTEM.
+   - **Giới hạn:** Trong phiên thực hành, do máy ảo bị cô lập mạng hoàn toàn, nhánh quét SMB ra ngoài của service này không phát tán sang máy khác được.
+
+---
+
+### PHÂN TÍCH HÀNH VI 03 — THẢ PAYLOAD VÀ THƯ MỤC LÀM VIỆC (DROPPER & PAYLOAD EXTRACTION)
+
+#### 1. Khái niệm Dropper
+Mẫu WannaCry ban đầu không trực tiếp mã hóa mà đóng vai trò "Dropper" (Bộ giải nén chứa payload). Nó chứa một tệp nén ZIP mã hóa password trong tài nguyên (`Resource section .rsrc`) chứa toàn bộ bộ công cụ tống tiền.
+
+#### 2. Phân tích 6 bước chi tiết
+1. **Quan sát:** Tệp thực thi `C:\Windows	asksche.exe` được tạo mới, sau đó xuất hiện thư mục ngẫu nhiên `C:\ProgramData\evmdthrukdvwcqn063\`.
+2. **Giải nghĩa lệnh:** 
+   - Lệnh gọi: `C:\Windows	asksche.exe /i`. Tham số `/i` là cờ cài đặt (Install), hướng dẫn mã độc giải nén payload vào thư mục `ProgramData` và đăng ký dịch vụ thứ hai.
+3. **Cơ chế HĐH:** Hệ điều hành cấp phát không gian trong `ProgramData` (thư mục chia sẻ toàn hệ thống không yêu cầu quyền riêng của từng user) để mọi tài khoản trên máy đều bị ảnh hưởng.
+4. **Mối liên hệ:** Sau khi giải nén xong, tệp `tasksche.exe` trong `ProgramData` (PID 3760) được kích hoạt dưới quyền SYSTEM. Đây chính là tiến trình chịu trách nhiệm quét và mã hóa file.
+5. **Bằng chứng tại chỗ:**
+
+![Cây tiến trình Procmon mở rộng 15 nhánh](screenshots/B_procmon_tree_expanded_vmware.png)
+*Chú thích: Nhánh thực thi từ services.exe -> PID 5272 -> tasksche.exe /i (PID 6724) -> tasksche.exe (PID 3760).*
+
+![Procmon Event Process Identity](screenshots/B_procmon_event_process_identity_vmware.png)
+*Chú thích: Sự kiện chi tiết của PID 3760 xác minh User: NT AUTHORITY\SYSTEM.*
+
+6. **Kết luận & Giới hạn:**
+   - **Chứng minh được:** Quá trình chuyển giao vai trò từ Dropper ban đầu sang Payload độc lập trong ProgramData.
+   - **Giới hạn:** Không thể đọc trực tiếp mật khẩu giải nén ZIP tài nguyên nếu chỉ nhìn log Procmon (cần dịch ngược tĩnh file nhị phân).
+
+---
+
+### PHÂN TÍCH HÀNH VI 04 — THAO TÚNG THUỘC TÍNH & QUYỀN HỆ THỐNG (`icacls` & `attrib`)
+
+#### 1. Khái niệm Phòng thủ Né tránh & Ức chế Khôi phục (Defense Evasion & Inhibit Recovery)
+Để ngăn chặn người dùng hoặc phần mềm bảo vệ xóa thư mục mã hóa hoặc truy cập tệp cấu hình, mã độc sử dụng công cụ dòng lệnh có sẵn của Windows để ẩn mình và mở rộng quyền truy cập.
+
+#### 2. Phân tích 6 bước chi tiết
+1. **Quan sát:** Tiến trình `cmd.exe` sinh ra hai tiến trình con: `attrib.exe` và `icacls.exe`.
+2. **Giải nghĩa lệnh:**
+   - `attrib.exe +h .`: Đặt thuộc tính Ẩn (Hidden) cho thư mục hiện hành (`.`), khiến người dùng mở File Explorer bình thường không thấy thư mục mã độc.
+   - `icacls.exe . /grant Everyone:F /T /C /Q`:
+     + `.`: Thư mục hiện tại (`C:\ProgramData\evmdthrukdvwcqn063\`).
+     + `/grant Everyone:F`: Cấp toàn quyền điều khiển (Full Control) cho nhóm người dùng `Everyone`.
+     + `/T`: Áp dụng đệ quy cho toàn bộ tệp và thư mục con.
+     + `/C`: Tiếp tục thực thi dù gặp lỗi.
+     + `/Q`: Chạy ngầm im lặng (Quiet), không in thông báo ra màn hình.
+3. **Cơ chế HĐH:** Windows áp dụng Access Control Entry (ACE) mới vào Security Descriptor của thư mục, đảm bảo các tiến trình mã hóa chạy dưới bất kỳ ngữ cảnh nào cũng không bị lỗi `Access Denied`.
+4. **Mối liên hệ:** Lệnh này chạy ngay trước khi đợt mã hóa hàng loạt bắt đầu, dọn đường cho việc ghi đè dữ liệu diễn ra trơn tru.
+5. **Bằng chứng tại chỗ:** Ghi nhận tại Bản ghi Procmon 1725–1728 (`B_unreachable.csv`).
+6. **Kết luận & Giới hạn:**
+   - **Chứng minh được:** Mã độc tận dụng các công cụ hệ thống hợp pháp (`Living off the Land`) để thao túng quyền tệp.
+   - **Giới hạn:** Lệnh này chỉ tác động lên thư mục của mã độc trong ProgramData, không tác động trực tiếp lên toàn bộ ổ đĩa C.
+
+---
+
+### PHÂN TÍCH HÀNH VI 05 — QUÁ TRÌNH MÃ HÓA TỆP DECOY & HEADER `WANACRY!`
+
+#### 1. Khái niệm & Phân biệt Trọng yếu
+> ⚠️ **Lưu ý phương pháp luận:** Cần phân biệt rõ giữa việc **"Quan sát thấy tệp bị thay đổi"** và **"Chứng minh thuật toán/quản lý khóa mã hóa"**.  
+> Qua phân tích động (Dynamic Analysis), ta quan sát được chuỗi thao tác tệp, phần mở rộng mới và phần đệm header nhị phân. Để biết chính xác thuật toán là AES-128 kết hợp RSA-2048, cần kết hợp đối chiếu các thư viện CryptoAPI được nạp (`rsaenh.dll`, `CRYPTSP.dll`) và phân tích tĩnh cấu trúc khóa.
+
+#### 2. Quy trình Biến đổi Tệp Tin (File Lifecycle)
+```text
+[Tệp Gốc: inventory.csv]
+          │
+          ▼ 1. Đọc nội dung gốc (ReadFile)
+          ▼ 2. Mã hóa trong bộ nhớ (CryptoAPI)
+          │
+          ▼ 3. Ghi vào tệp tạm thời
+   [inventory.csv.WNCRYT] (Tệp chứa header WANACRY! + Ciphertext)
+          │
+          ▼ 4. Xóa tệp gốc an toàn
+          ▼ 5. Đổi tên tệp tạm (SetRenameInformationFile)
+   [inventory.csv.WNCRY] (Tệp bị khóa chính thức)
+```
+
+#### 3. Bằng chứng tại chỗ (Contextual Evidence)
+![Procmon: Chuỗi sự kiện tệp trên thư mục Decoys](screenshots/B_procmon_decoy_events_vmware.png)
+*Chú thích: Procmon ghi nhận PID 3760 liên tục thực hiện CreateFile, WriteFile, SetRenameInformationFile trên 3 tệp mồi trong chưa đầy 12 mili-giây.*
+
+![Procmon: Thuộc tính đổi tên thành .WNCRY](screenshots/B_procmon_rename_properties_vmware.png)
+*Chú thích: Chi tiết sự kiện SetRenameInformationFile: FileName đổi từ `inventory.csv.WNCRYT` sang `inventory.csv.WNCRY`.*
+
+![Explorer: 3 Tệp mồi bị khóa và đổi hình nền](screenshots/B_decoys_encrypted_host_verified_vmware.png)
+*Chú thích: File Explorer xác minh 3 tệp mồi mang biểu tượng khóa, tệp `@Please_Read_Me@.txt` xuất hiện và hình nền chuyển sang màu đen.*
+
+#### 4. Bảng Kiểm Tra Toàn Vẹn & Header Nhị Phân
+| Tệp Tin Mồi | Kích thước Trước | Kích thước Sau | SHA-256 Sau Mã Hóa | Magic Header Quan Sát |
+| :--- | :---: | :---: | :--- | :---: |
+| `inventory.csv` | 13,016 B | 15,360 B | `4F51C17B9D2D2E689C762E401764AE71...` | `WANACRY!` |
+| `lab_document.rtf`| 28,450 B | 30,720 B | `C3D68DAACD2BE38DFB7C4B088F5E973E...` | `WANACRY!` |
+| `student_notes.txt`| 1,248 B | 3,584 B | `3EAEC063DF98BE64878B3F5D6B690A37...` | `WANACRY!` |
+
+- **Ý nghĩa:** Kích thước tệp sau mã hóa luôn tăng lên (chính xác bằng kích thước padding block mã hóa cộng thêm khối header metadata `WANACRY!` lưu giữ khóa AES đã mã hóa bằng RSA public key của kẻ tấn công).
+
+---
+
+### PHÂN TÍCH HÀNH VI 06 — GIAO DIỆN TỐNG TIỀN WANA DECRYPT0R 2.0 & ĐÒI TIỀN CHUỘC
+
+#### 1. Khái niệm Ransom Demand Interface
+Sau khi hoàn tất mã hóa các tài liệu quan trọng, mã độc phải thông báo cho nạn nhân biết dữ liệu đã bị khóa và hướng dẫn cách nộp tiền chuộc để kẻ tấn công thu lợi bất chính.
+
+#### 2. Phân tích 6 bước chi tiết
+1. **Quan sát:** Xuất hiện cửa sổ đồ họa mang tên **Wana Decrypt0r 2.0** nổi trên màn hình cùng hình nền desktop bị thay đổi thành màu đen cảnh báo.
+2. **Giải nghĩa tiến trình:** Tiến trình `C:\ProgramData\evmdthrukdvwcqn063\@WanaDecryptor@.exe` (PID `1752`) được kích hoạt. Tiến trình này nạp thư viện GUI cổ điển của Microsoft: `MFC42.DLL`, `RICHED20.dll`, `COMCTL32.dll`.
+3. **Cơ chế HĐH:** Mã độc gọi API `SystemParametersInfoW(SPI_SETDESKWALLPAPER)` trỏ vào tệp ảnh nền bitmap do nó vừa tạo ra để thay đổi hình nền toàn hệ thống. Đồng thời gọi `cscript.exe //nologo m.vbs` để thả shortcut `.lnk` ra Desktop người dùng.
+4. **Mối liên hệ:** Đây là mắt xích cuối cùng trong chuỗi tấn công cục bộ trên máy nạn nhân.
+5. **Bằng chứng tại chỗ:**
+
+![Giao diện Wana Decrypt0r 2.0 kèm nhãn sinh viên](screenshots/B_ransom_gui_final_identity_vmware.png)
+*Chú thích: Cửa sổ Wana Decrypt0r 2.0 hiển thị 2 đồng hồ đếm ngược (3 ngày tăng giá lên 600$, 7 ngày xóa dữ liệu), yêu cầu 300$ Bitcoin về ví `115p7UMMngoj1pMvkpHijcRdfJNXj6LrLn` kèm nhãn định danh sinh viên Nguyen Van Bach (DE200409).*
+
+6. **Kết luận & Giới hạn:**
+   - **Chứng minh được:** Toàn bộ chuỗi tống tiền diễn ra hoàn chỉnh và tự động trong môi trường lab cô lập.
+   - **Giới hạn:** Nút "Check Payment" và "Decrypt" trên giao diện không thể hoạt động do máy ảo không có kết nối ra mạng Tor/Internet.
+
+---
+
+## 🔬 CẤP ĐỘ 3: BÁO CÁO KỸ THUẬT CHUYÊN SÂU & KIỂM TOÁN THỰC NGHIỆM (15 YÊU CẦU HỌC PHẦN IAM302)
+*Tối ưu cho Giảng viên, Hội đồng phản biện và Chuyên gia SOC cần kiểm tra toàn bộ 15 yêu cầu kỹ thuật chi tiết theo đề bài.*
 
 ## 1. Tổng quan & Thiết lập môi trường cách ly (Execution Context & Containment)
 
@@ -404,3 +601,24 @@ Dựa trên toàn bộ chứng cứ số thực nghiệm được thu thập, 9 
 
 9. **Các kỹ thuật phân tích được map sang MITRE ATT&CK gồm những gì?**  
    Các kỹ thuật được chứng minh từ thực nghiệm bao gồm: `T1204.002` (User Execution), `T1543.003` (Windows Service), `T1486` (Data Encrypted for Impact), `T1490` (Inhibit System Recovery), `T1036.005` (Masquerading), `T1222.001` (File Permissions Modification), `T1059.003` (Windows Command Shell), và `T1059.005` (Visual Basic Script).
+
+---
+
+## 📦 CẤP ĐỘ 4: KHO BẰNG CHỨNG SỐ TỔNG HỢP (EVIDENCE REPOSITORY)
+*Dành cho việc tra cứu chéo, kiểm tra băm toàn vẹn và tải tệp chứng cứ độc lập.*
+
+| Mã Bằng Chứng | Công Cụ Thu Thập | Tệp Ảnh / Nhật Ký | Đối Tượng Xác Minh | Tình Trạng Kiểm Toán |
+| :---: | :---: | :--- | :--- | :---: |
+| **EV-01** | Burp Suite Pro | `screenshots/A_burp_item4_host_verified_vmware.png` | Gói tin HTTP 200 OK Kill-switch | ✅ Khớp 100% |
+| **EV-02** | Process Monitor | `screenshots/A_run_direct_launch_1143_vmware.png` | PID 6520 tự kết thúc mã 0 sau 0.89s | ✅ Khớp 100% |
+| **EV-03** | Process Monitor | `screenshots/B_procmon_tree_expanded_vmware.png` | Cây tiến trình mở rộng 15 nhánh độc hại | ✅ Khớp 100% |
+| **EV-04** | Process Monitor | `screenshots/B_procmon_event_process_identity_vmware.png` | Tiến trình PID 3760 chạy quyền SYSTEM | ✅ Khớp 100% |
+| **EV-05** | Process Monitor | `screenshots/B_procmon_decoy_events_vmware.png` | Sự kiện đọc ghi 3 tệp mồi Decoys | ✅ Khớp 100% |
+| **EV-06** | Process Monitor | `screenshots/B_procmon_rename_properties_vmware.png` | Đổi tên tệp tạm `.WNCRYT` sang `.WNCRY` | ✅ Khớp 100% |
+| **EV-07** | Process Hacker | `screenshots/B_service_mssecsvc_selected_vmware.png` | Dịch vụ `mssecsvc2.0` trạng thái Running | ✅ Khớp 100% |
+| **EV-08** | Process Hacker | `screenshots/B_service_mssecsvc_properties_vmware.png` | Dịch vụ chạy dưới quyền LocalSystem | ✅ Khớp 100% |
+| **EV-09** | Process Hacker | `screenshots/B_processhacker_tasksche_handles_vmware.png` | Named Mutant `MsWinZonesCacheCounterMutexA` | ✅ Khớp 100% |
+| **EV-10** | Process Hacker | `screenshots/B_processhacker_tasksche_modules_vmware.png` | Danh mục nạp thư viện CryptoAPI | ✅ Khớp 100% |
+| **EV-11** | File Explorer | `screenshots/B_decoys_encrypted_host_verified_vmware.png` | 3 Tệp mồi bị khóa & đổi hình nền đen | ✅ Khớp 100% |
+| **EV-12** | Ransomware UI | `screenshots/B_ransom_gui_final_identity_vmware.png` | Cửa sổ Wana Decrypt0r 2.0 kèm định danh SV | ✅ Khớp 100% |
+| **EV-13** | Event Log EVTX | `service_events_7045.evtx` | Bản ghi Event ID 7045 đăng ký 2 Service | ✅ Khớp 100% |
