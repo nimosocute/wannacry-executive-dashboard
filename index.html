@@ -251,6 +251,52 @@
       </div>
     </section>
   
+    
+    <!-- MULTI-TOOL EVIDENCE VAULT -->
+    <section class="glass rounded-2xl p-6 sm:p-8 border border-zinc-800 space-y-6" id="gallery">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold mb-1">
+            <i data-lucide="layers" class="w-3.5 h-3.5"></i> Đa Công Cụ Kiểm Toán (Multi-Tool Audit)
+          </div>
+          <h3 class="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            Kho Bằng Chứng Đầy Đủ Tất Cả Các Tool
+          </h3>
+          <p class="text-xs text-zinc-400 mt-1">
+            Toàn bộ ảnh bằng chứng thực nghiệm từ Process Monitor, Process Hacker, Burp Suite Pro, Windows Explorer và Ransom GUI
+          </p>
+        </div>
+        
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="filterGallery('all')" id="flt-all" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-blue-600 text-white shadow-sm">
+            Tất cả (14)
+          </button>
+          <button onclick="filterGallery('procmon')" id="flt-procmon" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800">
+            Process Monitor (5)
+          </button>
+          <button onclick="filterGallery('processhacker')" id="flt-processhacker" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800">
+            Process Hacker (5)
+          </button>
+          <button onclick="filterGallery('burpsuite')" id="flt-burpsuite" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800">
+            Burp Suite (1)
+          </button>
+          <button onclick="filterGallery('explorer')" id="flt-explorer" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800">
+            Explorer & Decoys (1)
+          </button>
+          <button onclick="filterGallery('ransomgui')" id="flt-ransomgui" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800">
+            Ransom GUI (2)
+          </button>
+        </div>
+      </div>
+
+      <!-- Evidence Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="galleryGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+
     <!-- SECTION 6: MITRE ATT&CK & TIMELINE ATTACK TRACE -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- MITRE ATT&CK -->
@@ -792,7 +838,193 @@
       document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     }
 
+    
+    const evidenceGalleryData = [
+  {
+    "id": "ev_procmon_1",
+    "tool": "Process Monitor",
+    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    "tool_code": "procmon",
+    "title": "Cây tiến trình Procmon mở rộng (15 Nhánh)",
+    "desc": "Xác minh toàn bộ quan hệ cha - con (PPID - PID) của 15 tiến trình độc hại chạy dưới quyền SYSTEM.",
+    "file": "screenshots/B_procmon_tree_expanded_vmware.png"
+  },
+  {
+    "id": "ev_procmon_2",
+    "tool": "Process Monitor",
+    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    "tool_code": "procmon",
+    "title": "Tiến trình mã hóa cốt lõi (PID 3760 SYSTEM)",
+    "desc": "Bản ghi Procmon xác minh tasksche.exe thực thi độc quyền dưới tài khoản NT AUTHORITY\\SYSTEM.",
+    "file": "screenshots/B_procmon_event_process_identity_vmware.png"
+  },
+  {
+    "id": "ev_procmon_3",
+    "tool": "Process Monitor",
+    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    "tool_code": "procmon",
+    "title": "Nhật ký can thiệp tệp Decoy trong Lab",
+    "desc": "Procmon ghi nhận chuỗi sự kiện CreateFile, WriteFile, SetRenameInformationFile trên thư mục Decoys.",
+    "file": "screenshots/B_procmon_decoy_events_vmware.png"
+  },
+  {
+    "id": "ev_procmon_4",
+    "tool": "Process Monitor",
+    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    "tool_code": "procmon",
+    "title": "Thuộc tính sự kiện đổi tên sang đuôi .WNCRY",
+    "desc": "Bản ghi chi tiết thao tác đổi tên từ inventory.csv.WNCRYT thành inventory.csv.WNCRY.",
+    "file": "screenshots/B_procmon_rename_properties_vmware.png"
+  },
+  {
+    "id": "ev_procmon_5",
+    "tool": "Process Monitor",
+    "tool_badge": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    "tool_code": "procmon",
+    "title": "Kịch bản A: Thoát sạch mã 0 trong 0.89 giây",
+    "desc": "Procmon xác minh PID 6520 tự kết thúc sạch sẽ sau khi nhận HTTP 200 OK từ Burp Suite.",
+    "file": "screenshots/A_run_direct_launch_1143_vmware.png"
+  },
+  {
+    "id": "ev_ph_1",
+    "tool": "Process Hacker",
+    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    "tool_code": "processhacker",
+    "title": "Dịch vụ ngầm mssecsvc2.0 đang chạy",
+    "desc": "Process Hacker Services tab hiển thị dịch vụ độc hại ngụy trang với trạng thái Running và Start type Auto.",
+    "file": "screenshots/B_service_mssecsvc_selected_vmware.png"
+  },
+  {
+    "id": "ev_ph_2",
+    "tool": "Process Hacker",
+    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    "tool_code": "processhacker",
+    "title": "Thuộc tính dịch vụ mssecsvc2.0 (LocalSystem)",
+    "desc": "Xác nhận đường dẫn binary chứa cờ -m security và tài khoản thực thi LocalSystem duy trì persistence.",
+    "file": "screenshots/B_service_mssecsvc_properties_vmware.png"
+  },
+  {
+    "id": "ev_ph_3",
+    "tool": "Process Hacker",
+    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    "tool_code": "processhacker",
+    "title": "Danh sách Named Handles của tasksche.exe",
+    "desc": "Process Hacker liệt kê toàn bộ Mutant MsWinZonesCacheCounterMutexA, Mutex và File handles đang mở.",
+    "file": "screenshots/B_processhacker_tasksche_handles_vmware.png"
+  },
+  {
+    "id": "ev_ph_4",
+    "tool": "Process Hacker",
+    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    "tool_code": "processhacker",
+    "title": "Danh mục Loaded Modules DLLs của tasksche.exe",
+    "desc": "Xác minh các thư viện mật mã nạp vào bộ nhớ: CRYPTSP.dll, rsaenh.dll, CRYPTBASE.dll, bcryptPrimitives.dll.",
+    "file": "screenshots/B_processhacker_tasksche_modules_vmware.png"
+  },
+  {
+    "id": "ev_ph_5",
+    "tool": "Process Hacker",
+    "tool_badge": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    "tool_code": "processhacker",
+    "title": "Tổng quan tiến trình Process Hacker Host Verified",
+    "desc": "Giao diện Process Hacker toàn màn hình giám sát toàn bộ các tiến trình độc hại trong VM.",
+    "file": "screenshots/B_processhacker_host_verified_vmware.png"
+  },
+  {
+    "id": "ev_burp_1",
+    "tool": "Burp Suite Pro",
+    "tool_badge": "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    "tool_code": "burpsuite",
+    "title": "Burp Item #4: Bắt gói tin Kill-switch HTTP 200",
+    "desc": "Toàn văn HTTP Request GET / và HTTP Response 200 OK giả lập môi trường chặn đứng đợt tấn công.",
+    "file": "screenshots/A_burp_item4_host_verified_vmware.png"
+  },
+  {
+    "id": "ev_explorer_1",
+    "tool": "Explorer & Desktop",
+    "tool_badge": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    "tool_code": "explorer",
+    "title": "Thư mục Decoys bị mã hóa & Đổi hình nền",
+    "desc": "Windows Explorer hiển thị 3 tệp mồi bị đổi đuôi .WNCRY kèm văn bản tống tiền và hình nền desktop chuyển sang màu đen.",
+    "file": "screenshots/B_decoys_encrypted_host_verified_vmware.png"
+  },
+  {
+    "id": "ev_ransom_1",
+    "tool": "Ransomware GUI",
+    "tool_badge": "bg-red-500/10 text-red-400 border-red-500/20",
+    "tool_code": "ransomgui",
+    "title": "Giao diện Wana Decrypt0r 2.0 (Định danh Sinh viên)",
+    "desc": "Cửa sổ tống tiền đòi 300$ Bitcoin, đồng hồ đếm ngược 3 ngày/7 ngày kèm nhãn chứng minh sinh viên Nguyen Van Bach.",
+    "file": "screenshots/B_ransom_gui_final_identity_vmware.png"
+  },
+  {
+    "id": "ev_ransom_2",
+    "tool": "Ransomware GUI",
+    "tool_badge": "bg-red-500/10 text-red-400 border-red-500/20",
+    "tool_code": "ransomgui",
+    "title": "Giao diện Wana Decrypt0r 2.0 trực tiếp trên VM",
+    "desc": "Chụp toàn màn hình máy ảo Windows 10 chứng minh ransomware chiếm quyền điều khiển Desktop hoàn toàn.",
+    "file": "screenshots/B_wanadecryptor_host_live_vmware.png"
+  }
+];
+
+    function renderGallery(filter = 'all') {
+      const grid = document.getElementById('galleryGrid');
+      if (!grid) return;
+      const filtered = filter === 'all' ? evidenceGalleryData : evidenceGalleryData.filter(item => item.tool_code === filter);
+      grid.innerHTML = filtered.map(item => `
+        <div class="glass-card rounded-xl overflow-hidden border border-zinc-800/80 hover:border-zinc-700 transition flex flex-col group shadow-lg">
+          <div class="relative bg-zinc-950 aspect-[16/10] overflow-hidden cursor-pointer" onclick="openModalWithSrc('${item.file}', '${item.title}')">
+            <img src="${item.file}" alt="${item.title}" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300 opacity-90 group-hover:opacity-100" />
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
+            <span class="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.tool_badge}">
+              ${item.tool}
+            </span>
+            <div class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-zinc-900/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow">
+              <i data-lucide="zoom-in" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-2">
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-blue-400 transition leading-snug">${item.title}</h4>
+              <p class="text-xs text-zinc-400 mt-1 leading-relaxed">${item.desc}</p>
+            </div>
+            <button onclick="openModalWithSrc('${item.file}', '${item.title}')" class="w-full py-1.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> Phóng to xem bằng chứng
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterGallery(tool) {
+      const buttons = ['all', 'procmon', 'processhacker', 'burpsuite', 'explorer', 'ransomgui'];
+      buttons.forEach(b => {
+        const btn = document.getElementById('flt-' + b);
+        if (btn) {
+          if (b === tool) {
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-blue-600 text-white shadow-sm';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800';
+          }
+        }
+      });
+      renderGallery(tool);
+    }
+
+    function openModalWithSrc(src, title) {
+      const modal = document.getElementById('imgModal');
+      const img = document.getElementById('modalImg');
+      const titleEl = document.getElementById('modalTitle');
+      img.src = src;
+      titleEl.textContent = title;
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      renderGallery('all');
       setScenario('A');
       renderProcesses();
       renderIocs();
