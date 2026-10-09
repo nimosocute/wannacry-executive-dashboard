@@ -1,0 +1,48 @@
+.crypto-explorer {
+  color: var(--ink, #17202b);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.crypto-explorer h3 { font-size: 20px; margin: 0 0 12px; }
+.crypto-explorer p { margin: 12px 0; }
+.crypto-diagram {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 12px;
+  padding: 0;
+  list-style-position: inside;
+}
+.crypto-diagram li, .crypto-result {
+  background: var(--surface, #fff);
+  border: 1px solid var(--line, #cbd5e1);
+  padding: 16px;
+}
+.crypto-diagram strong { display: block; overflow-wrap: anywhere; }
+.crypto-details { border-top: 1px solid var(--line, #cbd5e1); margin-top: 16px; }
+.crypto-details summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 12px 0;
+  font-weight: 600;
+}
+.crypto-controls { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0 16px; }
+.crypto-controls label { flex: 1 1 180px; min-width: 0; font-size: 16px; }
+.crypto-controls select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--line, #cbd5e1);
+  background: var(--surface, #fff);
+  color: var(--ink, #17202b);
+  font: inherit;
+}
+.crypto-result dl { margin: 0; }
+.crypto-result dl > div { margin-bottom: 12px; }
+.crypto-result dt { color: var(--muted, #475569); }
+.crypto-result dd { margin: 0; font-family: monospace; overflow-wrap: anywhere; }
+.crypto-links { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.crypto-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent, #174fa8); text-decoration: underline; }
+.crypto-explorer :is(select, summary, a):focus-visible { outline: 3px solid var(--accent, #174fa8); outline-offset: 3px; }
+.crypto-explorer code { overflow-wrap: anywhere; font-size: 14px; }

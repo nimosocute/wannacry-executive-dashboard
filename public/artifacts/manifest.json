@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "warning": "Selected text excerpts, not full captures. Record indexes are 1-based CSV data records, excluding the header. Hash/header evidence does not prove a cryptographic algorithm.",
+  "artifact": "source-records.json",
+  "artifact_bytes": 51001,
+  "artifact_sha256": "384AD932DFA4F0AB8E07D3845D2AB0275BE427AB221B9E1902B5323E4D15DB2E",
+  "sources": [
+    {
+      "source_filename": "A_200.csv",
+      "original_sha256": "BFCEE9B68E96E01158331605FDA972E683399710DD5A52F51E6A8F3A2DEE213D",
+      "original_bytes": 508926,
+      "source_entry_count": 1710,
+      "excerpt_entry_count": 14,
+      "excerpt_bytes": 11096,
+      "kind": "csv_data_records"
+    },
+    {
+      "source_filename": "B_unreachable.csv",
+      "original_sha256": "AE5EB6BF78685AD4D7A662CC652F4FAFFF32592B8E9BA7C470DE5841F99CD29F",
+      "original_bytes": 125632698,
+      "source_entry_count": 309281,
+      "excerpt_entry_count": 42,
+      "excerpt_bytes": 28640,
+      "kind": "csv_data_records"
+    },
+    {
+      "source_filename": "decoys_before.csv",
+      "original_sha256": "D227F3C95277E58CC4216A940456B69DB977CB9AE64D7C22BC7A70DE5F095781",
+      "original_bytes": 475,
+      "source_entry_count": 3,
+      "excerpt_entry_count": 3,
+      "excerpt_bytes": 881,
+      "kind": "csv_data_records"
+    },
+    {
+      "source_filename": "decoys_A_200.csv",
+      "original_sha256": "D227F3C95277E58CC4216A940456B69DB977CB9AE64D7C22BC7A70DE5F095781",
+      "original_bytes": 475,
+      "source_entry_count": 3,
+      "excerpt_entry_count": 3,
+      "excerpt_bytes": 881,
+      "kind": "csv_data_records"
+    },
+    {
+      "source_filename": "decoys_after_hashes.csv",
+      "original_sha256": "B40BF3D0A65DC1FFC30BD731AC09B7492ED1D9A1101F63435C7E9333F38E2973",
+      "original_bytes": 804,
+      "source_entry_count": 5,
+      "excerpt_entry_count": 3,
+      "excerpt_bytes": 899,
+      "kind": "csv_data_records"
+    },
+    {
+      "source_filename": "decoys_after_files.csv",
+      "original_sha256": "7881E4BFCA07AA56E08D1237DB3CA055A1F24EA804F27993E6891440760E8ACE",
+      "original_bytes": 445,
+      "source_entry_count": 5,
+      "excerpt_entry_count": 3,
+      "excerpt_bytes": 737,
+      "kind": "csv_data_records"
+    },
+    {
+      "source_filename": "handles_modules_decoys_verified.md",
+      "original_sha256": "E05E0C7FDB8CCC3C780F23F7BCC1E3A8102FE09142A43A6954D12E9C33D6C33E",
+      "original_bytes": 19372,
+      "source_entry_count": 217,
+      "excerpt_entry_count": 15,
+      "excerpt_bytes": 2297,
+      "kind": "text_lines_from_existing_audit_not_new_binary_inspection"
+    }
+  ],
+  "verification": "Run py tests/verify-artifacts.py on the original case host; optional --source-dir points to original text evidence. Public excerpts alone cannot independently re-hash absent full captures."
+}

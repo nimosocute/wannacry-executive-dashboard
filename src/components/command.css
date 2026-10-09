@@ -1,0 +1,19 @@
+.cmd-explainer { color: var(--ink); font-size: 1rem; line-height: 1.6; min-width: 0; }
+.cmd-explainer h2 { margin: 0; font-size: 1.4rem; }
+.cmd-explainer h3 { margin: 0 0 .75rem; font-size: 1rem; }
+.cmd-muted, .cmd-source { color: var(--muted); }
+.cmd-choices, .cmd-tokens { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1rem 0; }
+.cmd-explainer button, .cmd-explainer select { min-height: 44px; min-width: 44px; padding: .5rem .75rem; border: 1px solid var(--line); border-radius: .25rem; background: var(--surface); color: var(--ink); font: inherit; font-size: 1rem; text-align: left; cursor: pointer; max-width: 100%; }
+.cmd-explainer button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: .2em; }
+.cmd-explainer :is(button, select, a, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cmd-explainer code { font-family: ui-monospace, Consolas, monospace; font-size: 1em; overflow-wrap: anywhere; white-space: pre-wrap; }
+.cmd-explanation { border-block: 1px solid var(--line); padding: 1rem 0; }
+.cmd-explanation dl { margin: 0; }
+.cmd-explanation dl > div { display: grid; grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr); gap: .75rem; margin: .5rem 0; }
+.cmd-explanation dt { font-weight: 600; }
+.cmd-explanation dd { margin: 0; }
+.cmd-explainer a { color: var(--accent); text-underline-offset: .2em; overflow-wrap: anywhere; }
+.cmd-source { margin-bottom: 0; }
+.cmd-depth { margin-top: .5rem; }
+.cmd-depth summary { min-height: 44px; padding: .65rem 0; cursor: pointer; font-weight: 600; }
+@media (max-width: 560px) { .cmd-explanation dl > div { grid-template-columns: 1fr; gap: 0; } }

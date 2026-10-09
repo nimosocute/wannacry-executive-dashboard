@@ -1,0 +1,32 @@
+.ks-explorer {
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.ks-explorer h2 { margin: 0; font-size: 1.4rem; }
+.ks-explorer h3 { margin: 0 0 .6rem; font-size: 1.05rem; }
+.ks-explorer p { margin: .65rem 0; }
+.ks-explorer header > p, .ks-limit { color: var(--muted); }
+.ks-controls { margin: 1.2rem 0; padding: .65rem 1rem; border: 1px solid var(--line); }
+.ks-controls legend { padding: 0 .35rem; font-weight: 600; }
+.ks-controls label { display: flex; align-items: center; gap: .75rem; min-height: 44px; cursor: pointer; }
+.ks-controls input { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--accent); }
+.ks-controls input:focus-visible, .ks-explorer a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.ks-diagram { padding: 1rem; border: 1px solid var(--line); background: var(--surface); }
+.ks-condition { text-align: center; }
+.ks-branches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.ks-branch { display: flex; flex-direction: column; padding: .8rem; border: 2px solid var(--line); border-top: 4px solid var(--line); }
+.ks-branch.ks-selected { border-color: var(--accent); }
+.ks-selection { font-size: .875rem; font-weight: 700; }
+.ks-reason { padding: .75rem 0; }
+.ks-observation { padding: 1rem 0; border-top: 1px solid var(--line); min-width: 0; }
+.ks-explorer code { font-size: .875rem; overflow-wrap: anywhere; }
+.ks-links { display: flex; flex-wrap: wrap; gap: 0 1rem; }
+.ks-explorer a { color: var(--accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px; }
+.ks-limit { padding-top: .8rem; border-top: 1px solid var(--line); }
+@media (max-width: 600px) {
+  .ks-branches { grid-template-columns: 1fr; }
+  .ks-controls { padding: .6rem; }
+  .ks-diagram { padding: .75rem; }
+}
+

@@ -1,820 +1,149 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Layers,
-  Activity,
-  GitBranch,
-  Terminal,
-  Shield,
-  Image as ImageIcon,
-  FileText,
-  Search,
-  BookOpen,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  ChevronRight,
-  ChevronDown,
-  Copy,
-  Check,
-  ExternalLink,
-  ArrowRight,
-  Info,
-  Eye,
-  ShieldCheck,
-  ShieldAlert,
-  Cpu,
-  Lock,
-  Network,
-  X,
-  FileCode,
-  CornerDownRight,
-  Sparkles
-} from 'lucide-react';
-
+import React, { useEffect, useState } from 'react';
 import Header from './components/Header.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import KillSwitchSandbox from './components/KillSwitchSandbox.jsx';
 import CommandExplainer from './components/CommandExplainer.jsx';
 import ProcessLineageTree from './components/ProcessLineageTree.jsx';
-import EvidenceViewer from './components/EvidenceViewer.jsx';
+import FileEncryptionExplorer from './components/FileEncryptionExplorer.jsx';
+import InteractiveTimeline from './components/InteractiveTimeline.jsx';
+import EvidenceViewer, { EvidenceInline } from './components/EvidenceViewer.jsx';
+import { report } from './content/report.js';
 
-import behaviorsData from './data/behaviors.json';
-import glossaryData from './data/glossary.json';
-import processesData from './data/processes.json';
+const topics = { network:'Mạng', services:'Dịch vụ', payload:'Tiến trình', permissions:'Lệnh & quyền', files:'Tệp dữ liệu', ransom:'Tống tiền' };
+const oldAnchors = { sandbox:'network', behaviors:'network', commands:'permissions', 'process-tree':'payload', 'evidence-gallery':'evidence', recommendations:'conclusions', iocs:'appendix' };
+const findingFromHash = () => location.hash.replace('#finding-','');
+const artifactBase = `${import.meta.env.BASE_URL}artifacts/`;
+
+function SectionTitle({ number, title, children }) {
+  return <div className="section-heading"><span className="eyebrow">{number} / {title}</span><h2>{children}</h2></div>;
+}
+
+function Flow({ label, items }) {
+  return <ol className="concept-flow" aria-label={label}>{items.map(([title,body],i)=><li key={title}><span className="flow-index">{String(i+1).padStart(2,'0')}</span><strong>{title}</strong><span>{body}</span></li>)}</ol>;
+}
+
+function FindingVisual({ id }) {
+  if (id==='network') return <KillSwitchSandbox />;
+  if (id==='payload') return <><Flow label="Cầu nối thực thi đã xác minh" items={[
+    ['5152 · Mẫu','Sinh trực tiếp PID 6724'],['644 · SCM','Khởi chạy cmd.exe PID 1152'],['3760 · Payload','Con của cmd.exe PID 1152']]} /><p className="fine-print">Thứ tự trình bày không phải một cây PPID liền mạch. Mở cây để xem các cạnh đã đối chiếu.</p><ProcessLineageTree compact /></>;
+  if (id==='permissions') return <CommandExplainer />;
+  if (id==='files') return <FileEncryptionExplorer />;
+  if (id==='services') return <><Flow label="Từ cấu hình service tới tiến trình" items={[
+    ['SCM','services.exe · PID 644'],['Hai service mới','Auto start · LocalSystem'],['Hai nhánh thực thi','PID 5272 và cmd.exe PID 1152']]} /><p className="scope-note">Auto là cấu hình. Chưa thực hiện reboot để xác nhận chạy lại.</p></>;
+  return <><Flow label="Các lớp trình bày tống tiền" items={[
+    ['Ransom note','Yêu cầu $300 Bitcoin'],['Shortcut','Liên kết tới giao diện'],['GUI · 12:00:10','Quan sát sau capture B']]} /><p className="scope-note">Thấy yêu cầu thanh toán không chứng minh thanh toán hoặc giải mã hoạt động.</p></>;
+}
+
+function Finding({ finding, number }) {
+  return <article id={`finding-${finding.id}`} className="finding" aria-labelledby={`title-${finding.id}`}>
+    <div className="finding-heading"><span className="eyebrow">Hành vi {number} / {topics[finding.id]}</span><h3 id={`title-${finding.id}`}>{finding.title}</h3><p>{finding.summary}</p></div>
+    <div className="finding-visual"><FindingVisual id={finding.id} /></div>
+    <div className="context-evidence"><h4>Bằng chứng tại nhận định</h4><EvidenceInline ids={finding.evidenceIds} /></div>
+    <details className="reading-level"><summary><span>Giải thích từng bước</span><span className="summary-hint">Cơ chế & khái niệm</span></summary>
+      <p className="reading-label">Quan sát thực tế</p><p>{finding.observed}</p>
+      <ol className="explanation-steps">{finding.steps.map(step=><li key={step.title}><h4>{step.title}</h4><p>{step.body}</p></li>)}</ol>
+      <p className="reading-label">Diễn giải từ quan sát</p><p>{finding.inference}</p>
+      <h4>Khái niệm & kiến thức tham chiếu</h4><dl className="term-list">{finding.terms.filter(term=>!term.token.includes('SHA-256')).map(term=><div key={term.token}><dt>{term.token}</dt><dd>{term.meaning}</dd></div>)}</dl>
+    </details>
+    <details className="reading-level"><summary><span>Kiểm chứng chuyên sâu</span><span className="summary-hint">Record, nguồn & giới hạn</span></summary>
+      <h4>Điều chưa được chứng minh</h4><p>{finding.limit}</p>
+      <h4>Nguồn định lượng</h4><ul className="source-list">{finding.sources.map(source=><li key={source}>{source}</li>)}</ul>
+      <p><a href={`${artifactBase}source-records.json`} download>Trích lục CSV, hash & header (JSON)</a> · <a href={`${artifactBase}manifest.json`} download>Manifest SHA-256</a></p>
+      <p className="fine-print">Trích lục chọn lọc, có ghi rõ phần đã ẩn thông tin. Toàn bộ capture gốc lưu tại máy phân tích.</p>
+      {finding.terms.some(term=>term.token.includes('SHA-256'))&&<dl className="term-list">{finding.terms.filter(term=>term.token.includes('SHA-256')).map(term=><div key={term.token}><dt>{term.token}</dt><dd>{term.meaning}</dd></div>)}</dl>}
+      {!!finding.mitre.length&&<><h4>MITRE ATT&CK · ánh xạ theo bằng chứng</h4><dl className="term-list">{finding.mitre.map(item=><div key={item.id}><dt><a href={`https://attack.mitre.org/techniques/${item.id.replace('.','/')}/`} target="_blank" rel="noreferrer">{item.id} · {item.label}</a></dt><dd>{item.reason}<p className="fine-print">{item.limit}</p></dd></div>)}</dl></>}
+    </details>
+  </article>;
+}
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState('overview');
-  const [depthLevel, setDepthLevel] = useState('detailed'); // '30s', 'detailed', 'audit'
-  const [expandedBehavior, setExpandedBehavior] = useState('behavior-01');
-  const [glossaryOpen, setGlossaryOpen] = useState(false);
-  const [glossarySearch, setGlossarySearch] = useState('');
-  const [activeGlossaryTerm, setActiveGlossaryTerm] = useState('localsystem');
-  const [copiedText, setCopiedText] = useState(null);
-
-  const handleCopy = (text, id) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(id);
-    setTimeout(() => setCopiedText(null), 2000);
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setGlossaryOpen((prev) => !prev);
-      }
-      if (e.key === 'Escape' && glossaryOpen) {
-        setGlossaryOpen(false);
+  const [activeFinding,setActiveFinding]=useState(()=>topics[findingFromHash()]?findingFromHash():'network');
+  const [activeSection,setActiveSection]=useState('overview');
+  const [menuOpen,setMenuOpen]=useState(false);
+  const [glossaryQuery,setGlossaryQuery]=useState('');
+  const [glossaryOpen,setGlossaryOpen]=useState(false);
+  useEffect(()=>{
+    const navigate=()=>{
+      let target=location.hash.slice(1);
+      if(oldAnchors[target]) { const value=oldAnchors[target]; target=topics[value]?`finding-${value}`:value; history.replaceState(null,'',`#${target}`); }
+      const id=target.replace('finding-','');
+      if(topics[id]) setActiveFinding(id);
+      if(!target.startsWith('evidence-E') && target) requestAnimationFrame(()=>document.getElementById(target)?.scrollIntoView({block:'start'}));
+      setMenuOpen(false);
+    };
+    navigate(); window.addEventListener('hashchange',navigate); window.addEventListener('popstate',navigate);
+    const observer=new IntersectionObserver(entries=>{const visible=entries.filter(entry=>entry.isIntersecting); if(visible.length)setActiveSection(visible[0].target.id);},{rootMargin:'-72px 0px -55% 0px',threshold:0});
+    document.querySelectorAll('main > section').forEach(section=>observer.observe(section));
+    return ()=>{window.removeEventListener('hashchange',navigate);window.removeEventListener('popstate',navigate);observer.disconnect();};
+  },[]);
+  useEffect(()=>{
+    const onKey=event=>{
+      if(event.key==='Escape')setMenuOpen(false);
+      if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){
+        event.preventDefault();setGlossaryOpen(true);location.hash='glossary';requestAnimationFrame(()=>document.getElementById('glossary-search')?.focus());
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [glossaryOpen]);
+    window.addEventListener('keydown',onKey);return ()=>window.removeEventListener('keydown',onKey);
+  },[]);
+  const selectFinding=id=>{setActiveFinding(id);history.pushState(null,'',`#finding-${id}`);};
+  const selected=report.findings.find(item=>item.id===activeFinding);
+  const terms=report.findings.flatMap(finding=>finding.terms.map(term=>({...term,findingId:finding.id}))).filter(term=>`${term.token} ${term.meaning}`.toLocaleLowerCase('vi').includes(glossaryQuery.toLocaleLowerCase('vi')));
 
-  useEffect(() => {
-    const sections = ['overview', 'sandbox', 'behaviors', 'commands', 'process-tree', 'evidence-gallery', 'recommendations', 'iocs'];
-    const handleScroll = () => {
-      const scrollY = window.scrollY + 140;
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollY >= top && scrollY < top + height) {
-            setActiveSection(sectionId);
-            break;
-          }
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  return <>
+    <a className="skip-link" href="#main-content">Bỏ qua mục lục, tới nội dung</a>
+    <Header menuOpen={menuOpen} onToggleMenu={()=>setMenuOpen(value=>!value)} />
+    <Sidebar activeSection={activeSection} open={menuOpen} onNavigate={()=>setMenuOpen(false)} />
+    <div className="document-shell"><main id="main-content" tabIndex={-1}>
+      <section id="overview" className="overview">
+        <p className="breadcrumb">IAM302 <span>/</span> Phân tích động <span>/</span> WannaCry</p>
+        <p className="eyebrow">Hồ sơ thí nghiệm · 08 tháng 10, 2026</p>
+        <h1>WannaCry, qua<br className="title-break"/> hai phép thử.</h1>
+        <p className="lead">{report.lead}</p>
+        <dl className="outcomes"><div><dt>A <span>Endpoint có phản hồi</span></dt><dd>Mẫu thoát. Ba tệp giữ nguyên.<a href="#finding-network">Đối chiếu E01 + E02 <span aria-hidden="true">↗</span></a></dd></div><div><dt>B <span>Endpoint không tới được</span></dt><dd>Hai service mới. Ba tệp biến đổi.<a href="#finding-files">Đối chiếu E06 + E07 <span aria-hidden="true">↗</span></a></dd></div></dl>
+        <p className="scope-note">Kết luận giới hạn trong <strong>3 tệp thử nghiệm</strong>. Không chứng minh toàn máy bị mã hóa hoặc xác định thuật toán.</p>
+        <a className="text-action" href="#analysis">Khám phá cơ chế <span aria-hidden="true">↓</span></a>
+      </section>
 
-  const filteredGlossary = Object.entries(glossaryData).filter(([key, item]) => {
-    if (!glossarySearch.trim()) return true;
-    const q = glossarySearch.toLowerCase();
-    return (
-      item.title.toLowerCase().includes(q) ||
-      item.cat.toLowerCase().includes(q) ||
-      item.def.toLowerCase().includes(q) ||
-      item.mech.toLowerCase().includes(q)
-    );
-  });
+      <section id="experiment">
+        <SectionTitle number="02" title="Thí nghiệm">Cùng mẫu. Hai điều kiện mạng.</SectionTitle>
+        <Flow label="Thiết kế phép thử" items={[
+          ['Lấy baseline','Ba decoy có SHA-256 ban đầu'],['So sánh A / B','Đổi khả năng tới responder cục bộ'],['Đối chiếu','Procmon + HTTP + service + artifact']]} />
+        <details className="reading-level"><summary><span>Môi trường & phương pháp</span><span className="summary-hint">Phạm vi quan sát</span></summary><p>{report.experiment.summary}</p><ol className="prose-list">{report.experiment.steps.map(step=><li key={step}>{step}</li>)}</ol><h3>Giới hạn phép thử</h3><ul className="prose-list">{report.experiment.limits.map(limit=><li key={limit}>{limit}</li>)}</ul></details>
+      </section>
 
-  return (
-    <div className="min-h-screen bg-[#090a0f] text-[#f4f4f7] font-sans selection:bg-blue-500/20 selection:text-white">
-      <Header onOpenGlossary={() => setGlossaryOpen(true)} />
+      <section id="analysis">
+        <SectionTitle number="03" title="Phân tích tương tác">Chọn một hành vi. Hiểu từng bước.</SectionTitle>
+        <p className="section-intro">Mô hình để học; bằng chứng để kiểm chứng. Không có mẫu mã độc hay lệnh hệ thống nào được chạy trên trang.</p>
+        <div className="topic-navigation" role="group" aria-label="Chọn hành vi phân tích">{report.findings.map((finding,index)=><button type="button" key={finding.id} aria-pressed={activeFinding===finding.id} aria-controls={`finding-${finding.id}`} onClick={()=>selectFinding(finding.id)}><span>{String(index+1).padStart(2,'0')}</span>{topics[finding.id]}</button>)}</div>
+        {report.findings.map((finding,index)=><div key={finding.id} hidden={activeFinding!==finding.id}>{activeFinding===finding.id?<Finding finding={finding} number={String(index+1).padStart(2,'0')} />:<span id={`finding-${finding.id}`} />}</div>)}
+        <nav className="finding-pagination" aria-label="Hành vi kế tiếp"><span>{report.findings.indexOf(selected)+1} / 6 hành vi</span><button type="button" onClick={()=>selectFinding(report.findings[(report.findings.indexOf(selected)+1)%6].id)}>Hành vi tiếp theo <span aria-hidden="true">→</span></button></nav>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-8">
-        <Sidebar activeSection={activeSection} />
+      <section id="evidence">
+        <SectionTitle number="04" title="Bằng chứng & đối chiếu">Một nhận định. Nhiều nguồn đối chiếu.</SectionTitle>
+        <details className="reading-level timeline-disclosure"><summary><span>Khám phá dòng thời gian</span><span className="summary-hint">38 record · hai kịch bản</span></summary><InteractiveTimeline /></details>
+        <EvidenceViewer />
+        <p className="artifact-downloads"><a href={`${artifactBase}source-records.json`} download>Tải trích lục dữ liệu</a><a href={`${artifactBase}manifest.json`} download>Đối chiếu manifest SHA-256</a></p>
+        <p className="fine-print">Ảnh và trích lục là tài liệu quan sát, không phải dữ liệu do mô hình tạo ra. Capture đầy đủ không được công khai.</p>
+      </section>
 
-        <main className="flex-1 py-8 min-w-0 max-w-4xl space-y-16">
-          <section id="overview" className="scroll-mt-20 space-y-8">
-            <div className="space-y-3 pb-6 border-b border-[#1e2029]">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-zinc-400">
-                <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">LAB LIVE IAM302</span>
-                <span>&bull;</span>
-                <span>Mẫu: WannaCry (WanaCrypt0r 2.0)</span>
-                <span>&bull;</span>
-                <span className="text-zinc-500">SHA-256: 24d004a104d4...80b1022c</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100">
-                Phân Tích Động Học Nhị Phân & Hành Vi Mã Độc WannaCry
-              </h1>
-              <p className="text-sm text-zinc-400 leading-relaxed max-w-3xl">
-                Báo cáo kỹ thuật tự giải thích (Self-Explanatory Technical Report) theo mô hình độ sâu tăng dần (Progressive Depth). Bằng chứng thực nghiệm được phân tích tại chỗ bên cạnh từng nhận định, liên kết trực tiếp giữa quan sát mạng, dịch vụ Windows, cây tiến trình và cơ chế mã hóa.
-              </p>
-            </div>
+      <section id="conclusions">
+        <SectionTitle number="05" title="Kết luận">Thấy gì, kết luận đến đó.</SectionTitle>
+        <ul className="conclusion-list">{report.conclusions.map((conclusion,index)=><li key={conclusion}><span>{String(index+1).padStart(2,'0')}</span><p>{conclusion}</p></li>)}</ul>
+        <p className="scope-note">Bài học: đối chiếu tiến trình, thời điểm và artifact; không biến tên tệp, cấu hình Auto hoặc DLL được nạp thành bằng chứng tuyệt đối.</p>
+      </section>
 
-            <div className="p-4 rounded-lg bg-[#0f1015] border border-[#1e2029] space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">Mức độ chi tiết (Progressive Depth):</span>
-                </div>
-                <div className="inline-flex rounded-md p-1 bg-zinc-900 border border-zinc-800 text-xs">
-                  <button
-                    onClick={() => setDepthLevel('30s')}
-                    className={`px-3 py-1 rounded transition ${depthLevel === '30s' ? 'bg-zinc-800 text-zinc-100 font-medium shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    30 Giây (Executive)
-                  </button>
-                  <button
-                    onClick={() => setDepthLevel('detailed')}
-                    className={`px-3 py-1 rounded transition ${depthLevel === 'detailed' ? 'bg-zinc-800 text-zinc-100 font-medium shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    Giải Thích Cơ Chế
-                  </button>
-                  <button
-                    onClick={() => setDepthLevel('audit')}
-                    className={`px-3 py-1 rounded transition ${depthLevel === 'audit' ? 'bg-zinc-800 text-zinc-100 font-medium shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    Kiểm Toán Chuyên Sâu
-                  </button>
-                </div>
-              </div>
-
-              {depthLevel === '30s' && (
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-300 space-y-2 leading-relaxed">
-                  <div className="flex items-center gap-1.5 text-blue-400 font-medium">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Tóm tắt 30 giây: Quyết định rẽ nhánh nhị phân</span>
-                  </div>
-                  <p>
-                    Mã độc WannaCry sở hữu cơ chế rẽ nhánh nhị phân phụ thuộc hoàn toàn vào kết nối mạng tới một tên miền đặc biệt. Khi nhận được phản hồi HTTP 200 (Kịch bản A), tiến trình lập tức tự giải phóng và kết thúc an toàn trong <strong>0.89 giây</strong> mà không gây hại. Ngược lại, khi mạng không phản hồi (Kịch bản B), mã độc đăng ký dịch vụ ngầm <code className="text-zinc-200 font-mono">mssecsvc2.0</code> dưới quyền tối cao <code className="text-zinc-200 font-mono">SYSTEM</code>, thả payload <code className="text-zinc-200 font-mono">tasksche.exe</code>, cấp quyền <code className="text-zinc-200 font-mono">icacls Everyone:F</code> và tiến hành mã hóa hàng loạt tệp tin thành đuôi <code className="text-zinc-200 font-mono">.WNCRY</code>.
-                  </p>
-                </div>
-              )}
-
-              {depthLevel === 'detailed' && (
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-300 space-y-2 leading-relaxed">
-                  <div className="flex items-center gap-1.5 text-amber-400 font-medium">
-                    <Info className="w-3.5 h-3.5" />
-                    <span>Giải thích cơ chế hệ điều hành & Logic tấn công</span>
-                  </div>
-                  <p>
-                    Khác với giả định phổ biến rằng kill-switch là một lỗ hổng, bản chất đây là một cổng kiểm tra có chủ đích (thường dùng chống sandbox phân tích tự động). Khi kiểm tra thất bại, mã độc tận dụng cơ chế Service Control Manager (SCM PPID 644) để nâng quyền thực thi lên LocalSystem, vượt qua hàng rào UAC. Sau đó, nó áp dụng kỹ thuật Living-off-the-Land (LotL) thông qua các lệnh Win32 hợp pháp như <code className="text-zinc-200 font-mono">icacls</code> và <code className="text-zinc-200 font-mono">attrib</code> để chiếm toàn quyền truy cập trước khi nạp giao diện tống tiền.
-                  </p>
-                </div>
-              )}
-
-              {depthLevel === 'audit' && (
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-300 space-y-2 leading-relaxed">
-                  <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Dữ liệu thực nghiệm & Ranh giới kiểm toán (Audit Log)</span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center pt-1 font-mono text-[11px]">
-                    <div className="p-2 rounded bg-black/40 border border-zinc-800/80">
-                      <div className="text-zinc-400">Procmon Events</div>
-                      <div className="text-zinc-100 font-semibold text-sm">271,958</div>
-                    </div>
-                    <div className="p-2 rounded bg-black/40 border border-zinc-800/80">
-                      <div className="text-zinc-400">Verified PIDs</div>
-                      <div className="text-zinc-100 font-semibold text-sm">15</div>
-                    </div>
-                    <div className="p-2 rounded bg-black/40 border border-zinc-800/80">
-                      <div className="text-zinc-400">Decoy Overwrites</div>
-                      <div className="text-rose-400 font-semibold text-sm">3 / 3 (100%)</div>
-                    </div>
-                    <div className="p-2 rounded bg-black/40 border border-zinc-800/80">
-                      <div className="text-zinc-100 font-semibold text-sm">WANACRY!</div>
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-zinc-400 pt-1">
-                    *Giới hạn kiểm toán: Dữ liệu mạng Procmon ghi nhận TCP loopback 127.0.0.1:80. Môi trường lab ngắt card mạng vật lý nên không ghi nhận lưu lượng quét SMB TCP 445 ra bên ngoài (đây là giới hạn cách ly an toàn, không phải thiếu hụt tính năng của mẫu).
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                Phân cấp nhận thức: 3 Tầng Tri thức trong Báo cáo
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                <div className="p-3.5 rounded-lg bg-[#0f1015] border border-blue-900/30 space-y-2">
-                  <div className="flex items-center gap-1.5 font-medium text-blue-400">
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>1. Quan sát thực tế</span>
-                  </div>
-                  <p className="text-zinc-400 leading-relaxed text-[11px]">
-                    Dữ liệu vật lý đo lường trực tiếp: Gói tin HTTP 200 (155 bytes), mã thoát Exit 0, 15 PIDs trong Procmon, 3 file mồi decoy mang 8 byte đầu <code className="text-zinc-300 font-mono">WANACRY!</code>.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-lg bg-[#0f1015] border border-amber-900/30 space-y-2">
-                  <div className="flex items-center gap-1.5 font-medium text-amber-400">
-                    <Cpu className="w-3.5 h-3.5" />
-                    <span>2. Suy luận kỹ thuật</span>
-                  </div>
-                  <p className="text-zinc-400 leading-relaxed text-[11px]">
-                    Nhận định logic từ cơ chế: Cờ <code className="text-zinc-300 font-mono">-m security</code> chỉ định chế độ worker ngầm; đăng ký dịch vụ để chiếm quyền SYSTEM; lệnh icacls để tránh lỗi phân quyền.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-lg bg-[#0f1015] border border-purple-900/30 space-y-2">
-                  <div className="flex items-center gap-1.5 font-medium text-purple-400">
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>3. Kiến thức tham khảo</span>
-                  </div>
-                  <p className="text-zinc-400 leading-relaxed text-[11px]">
-                    Tri thức ngành bảo mật: Lỗ hổng MS17-010 EternalBlue, thuật toán kết hợp RSA-2048/AES-128, sinkhole tên miền của Marcus Hutchins vào ngày 12/05/2017.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                Đối chiếu Thực nghiệm: Kịch bản A vs Kịch bản B
-              </h3>
-              <div className="overflow-x-auto rounded-lg border border-[#1e2029]">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-zinc-900/80 text-zinc-300 font-mono border-b border-[#1e2029]">
-                      <th className="p-3 font-medium">Chỉ số So sánh</th>
-                      <th className="p-3 font-medium text-emerald-400">Kịch bản A (Kill-Switch Active)</th>
-                      <th className="p-3 font-medium text-rose-400">Kịch bản B (Kill-Switch Unreachable)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1e2029] bg-[#0f1015] text-zinc-400 font-mono text-[11px]">
-                    <tr>
-                      <td className="p-3 font-sans text-zinc-300">Phản hồi HTTP Tên miền</td>
-                      <td className="p-3 text-emerald-400">HTTP 200 OK (Sinkhole/Mock)</td>
-                      <td className="p-3 text-rose-400">Kết nối Thất bại (TCP RST / Reconnect)</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 font-sans text-zinc-300">Hành vi Thực thi</td>
-                      <td className="p-3">Tự kết thúc sạch (Exit Process)</td>
-                      <td className="p-3">Khai sinh chuỗi 15 tiến trình độc hại</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 font-sans text-zinc-300">Thời gian sống mẫu gốc</td>
-                      <td className="p-3">0.8922 giây (PID 6520)</td>
-                      <td className="p-3">Chạy liên tục, chuyển giao cho mssecsvc2.0</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 font-sans text-zinc-300">Dịch vụ Windows được tạo</td>
-                      <td className="p-3 text-emerald-400">0 dịch vụ</td>
-                      <td className="p-3 text-rose-400">2 dịch vụ ngầm (mssecsvc2.0, evmdthrukdvwcqn063)</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 font-sans text-zinc-300">Tệp mồi Decoy (File Decoys)</td>
-                      <td className="p-3 text-emerald-400">Nguyên vẹn 100% (Khớp SHA-256 ban đầu)</td>
-                      <td className="p-3 text-rose-400">Bị mã hóa 100% (.WNCRY + WANACRY! header)</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 font-sans text-zinc-300">Giao diện Đòi tiền chuộc</td>
-                      <td className="p-3 text-emerald-400">Không xuất hiện</td>
-                      <td className="p-3 text-rose-400">Xuất hiện @WanaDecryptor@.exe trên Desktop</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-          <section id="sandbox" className="scroll-mt-20 space-y-4">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Mô phỏng Trực quan Tương tác</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-400" />
-                <span>02. Live Demo: Trình Giả Lập Công Tắc Hủy (Kill-Switch Sandbox)</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Thay đổi điều kiện mạng (HTTP 200, Connection Refused, Timeout, NXDOMAIN) và độ trễ để quan sát luồng quyết định rẽ nhánh logic và sự biến thiên trạng thái của hệ điều hành.
-              </p>
-            </div>
-
-            <KillSwitchSandbox />
-          </section>
-
-          <section id="behaviors" className="scroll-mt-20 space-y-6">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Phân tích Chi tiết Từng Giai đoạn</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <GitBranch className="w-5 h-5 text-purple-400" />
-                <span>03. 6 Chuỗi Hành Vi Nhân - Quả & Khung Phân Tích 6 Bước</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Mỗi hành vi được giải phẫu theo cấu trúc chuẩn: Quan sát &rarr; Giải nghĩa &rarr; Cơ chế HĐH &rarr; Mối liên hệ &rarr; Bằng chứng kiểm chứng &rarr; Ranh giới kiểm toán.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {behaviorsData.map((b) => {
-                const isExpanded = expandedBehavior === b.id;
-                return (
-                  <div
-                    key={b.id}
-                    className="rounded-lg border border-[#1e2029] bg-[#0f1015] overflow-hidden transition-all duration-200"
-                  >
-                    <button
-                      onClick={() => setExpandedBehavior(isExpanded ? null : b.id)}
-                      className="w-full p-4 flex items-center justify-between text-left hover:bg-zinc-900/50 transition gap-4"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="w-6 h-6 rounded bg-zinc-800 text-zinc-300 font-mono text-xs flex items-center justify-center font-semibold shrink-0">
-                          {b.num}
-                        </span>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-mono text-zinc-500">{b.cat}</span>
-                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
-                              {b.badge}
-                            </span>
-                          </div>
-                          <h4 className="text-sm font-semibold text-zinc-100 truncate mt-0.5">
-                            {b.title}
-                          </h4>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-mono text-zinc-500 hidden sm:inline">
-                          {isExpanded ? 'Thu gọn' : 'Xem 6 bước'}
-                        </span>
-                        <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                      </div>
-                    </button>
-
-                    {isExpanded && (
-                      <div className="p-4 sm:p-6 border-t border-[#1e2029] bg-[#090a0f]/60 space-y-6 text-xs">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="p-3.5 rounded bg-[#0f1015] border border-zinc-800/80 space-y-1.5">
-                            <div className="font-mono text-zinc-400 font-medium text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                              <span className="text-blue-400 font-bold">BƯỚC 1</span> &bull; Quan sát Khái niệm
-                            </div>
-                            <p className="text-zinc-300 leading-relaxed text-xs">
-                              {b.step1_concept}
-                            </p>
-                          </div>
-
-                          <div className="p-3.5 rounded bg-[#0f1015] border border-zinc-800/80 space-y-1.5">
-                            <div className="font-mono text-zinc-400 font-medium text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                              <span className="text-purple-400 font-bold">BƯỚC 2</span> &bull; Lệnh & Tham số Tác động
-                            </div>
-                            <p className="text-zinc-300 leading-relaxed text-xs font-mono bg-black/40 p-2 rounded border border-zinc-800">
-                              {b.step2_params}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="p-3.5 rounded bg-[#0f1015] border border-zinc-800/80 space-y-1.5">
-                            <div className="font-mono text-zinc-400 font-medium text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                              <span className="text-amber-400 font-bold">BƯỚC 3</span> &bull; Cơ chế Xử lý của Hệ Điều Hành
-                            </div>
-                            <p className="text-zinc-300 leading-relaxed text-xs">
-                              {b.step3_os}
-                            </p>
-                          </div>
-
-                          <div className="p-3.5 rounded bg-[#0f1015] border border-zinc-800/80 space-y-1.5">
-                            <div className="font-mono text-zinc-400 font-medium text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                              <span className="text-emerald-400 font-bold">BƯỚC 4</span> &bull; Mối quan hệ Nhân - Quả
-                            </div>
-                            <p className="text-zinc-300 leading-relaxed text-xs">
-                              {b.step4_cause}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-3 pt-2">
-                          <div className="font-mono text-zinc-400 font-medium text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                            <span className="text-blue-400 font-bold">BƯỚC 5</span> &bull; Bằng chứng Thực nghiệm Tại Chỗ (Contextual Dual-Evidence)
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {b.evidence_a && (
-                              <div className="p-3.5 rounded bg-[#0f1015] border border-zinc-800 space-y-2">
-                                <div className="flex items-center justify-between text-xs font-mono">
-                                  <span className="text-zinc-300 font-semibold">{b.evidence_a.title}</span>
-                                  <span className="text-[10px] text-zinc-500 uppercase">{b.evidence_a.tool}</span>
-                                </div>
-                                <div className="rounded overflow-hidden border border-zinc-800 bg-black/60 relative group">
-                                  <img
-                                    src={b.evidence_a.file}
-                                    alt={b.evidence_a.title}
-                                    className="w-full h-40 object-cover object-top opacity-90 group-hover:opacity-100 transition"
-                                  />
-                                </div>
-                                <p className="text-[11px] text-zinc-400 leading-normal">{b.evidence_a.caption}</p>
-                                {b.evidence_a.breakdown && (
-                                  <div className="pt-2 border-t border-zinc-800/80 space-y-1 font-mono text-[10px]">
-                                    {b.evidence_a.breakdown.map((item, idx) => (
-                                      <div key={idx} className="flex justify-between text-zinc-400">
-                                        <span>{item.field}:</span>
-                                        <span className="text-zinc-200">{item.val}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                            {b.evidence_b && (
-                              <div className="p-3.5 rounded bg-[#0f1015] border border-zinc-800 space-y-2">
-                                <div className="flex items-center justify-between text-xs font-mono">
-                                  <span className="text-zinc-300 font-semibold">{b.evidence_b.title}</span>
-                                  <span className="text-[10px] text-zinc-500 uppercase">{b.evidence_b.tool}</span>
-                                </div>
-                                <div className="rounded overflow-hidden border border-zinc-800 bg-black/60 relative group">
-                                  <img
-                                    src={b.evidence_b.file}
-                                    alt={b.evidence_b.title}
-                                    className="w-full h-40 object-cover object-top opacity-90 group-hover:opacity-100 transition"
-                                  />
-                                </div>
-                                <p className="text-[11px] text-zinc-400 leading-normal">{b.evidence_b.caption}</p>
-                                {b.evidence_b.breakdown && (
-                                  <div className="pt-2 border-t border-zinc-800/80 space-y-1 font-mono text-[10px]">
-                                    {b.evidence_b.breakdown.map((item, idx) => (
-                                      <div key={idx} className="flex justify-between text-zinc-400">
-                                        <span>{item.field}:</span>
-                                        <span className="text-zinc-200">{item.val}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="p-4 rounded bg-zinc-900/60 border border-zinc-800 space-y-3 pt-3">
-                          <div className="font-mono text-zinc-400 font-medium text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                            <span className="text-amber-400 font-bold">BƯỚC 6</span> &bull; Ranh Giới Kiểm Toán Khoa Học
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-                                <CheckCircle2 className="w-3 h-3" /> ĐIỀU ĐÃ CHỨNG MINH ĐƯỢC
-                              </span>
-                              <p className="text-[11px] text-zinc-300 leading-relaxed">
-                                {b.boundary_proven}
-                              </p>
-                            </div>
-                            <div className="space-y-1">
-                              <span className="text-[11px] font-mono text-amber-400 flex items-center gap-1">
-                                <AlertTriangle className="w-3 h-3" /> GIỚI HẠN & ĐIỀU CHƯA CHỨNG MINH
-                              </span>
-                              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                                {b.boundary_limits}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          <section id="commands" className="scroll-mt-20 space-y-4">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Mô hình Living-off-the-Land (LotL)</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <Terminal className="w-5 h-5 text-emerald-400" />
-                <span>04. Trình Giải Thích Từng Token Cờ Lệnh & Cơ Chế Thực Thi</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Nhấp chuột vào từng tham số trong các lệnh hệ thống để xem cú pháp Win32 API, mục đích của kẻ tấn công và bằng chứng pháp y tương ứng.
-              </p>
-            </div>
-
-            <CommandExplainer />
-          </section>
-
-          <section id="process-tree" className="scroll-mt-20 space-y-4">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Cây Tiến trình Thực nghiệm</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-400" />
-                <span>05. Cây Tiến Trình (15 Verified PIDs & Phân cấp Đặc quyền)</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Toàn bộ 15 tiến trình độc hại đã được đối soát qua 271,958 bản ghi Procmon. Phân biệt rõ quyền người dùng bình thường vs NT AUTHORITY\SYSTEM.
-              </p>
-            </div>
-
-            <ProcessLineageTree />
-          </section>
-
-          <section id="evidence-gallery" className="scroll-mt-20 space-y-4">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Kho Lưu Trữ Bằng Chứng Đa Công Cụ</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-amber-400" />
-                <span>06. Kho Bằng Chứng Đa Công Cụ (Contextual Evidence Viewer)</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                So sánh chéo ảnh chụp thực tế giữa Burp Suite, Process Hacker, Procmon và màn hình máy ảo VMware. Bấm vào ảnh để phóng to chi tiết.
-              </p>
-            </div>
-
-            <EvidenceViewer />
-          </section>
-
-          <section id="recommendations" className="scroll-mt-20 space-y-6">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Chiến lược Phòng thủ Chiều sâu</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-emerald-400" />
-                <span>07. Khuyến Nghị Kỹ Thuật & Giải Pháp Khắc Phục</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Đúc kết từ hành vi động học của mẫu phân tích, xây dựng 3 lớp phòng ngự toàn diện từ máy trạm đến biên mạng.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="p-4 rounded-lg bg-[#0f1015] border border-[#1e2029] space-y-3">
-                <div className="flex items-center gap-2 font-semibold text-zinc-100">
-                  <span className="w-5 h-5 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center font-mono text-xs">1</span>
-                  <span>Vá lỗ hổng & Tắt SMBv1</span>
-                </div>
-                <p className="text-zinc-400 leading-relaxed">
-                  Ngăn chặn triệt để con đường lây nhiễm ngang của WannaCry qua việc vô hiệu hóa giao thức cổ lỗ SMBv1 trên toàn mạng nội bộ và áp dụng ngay bản vá Microsoft Security Bulletin MS17-010 (KB4012598).
-                </p>
-                <div className="p-2 rounded bg-black/40 font-mono text-[11px] text-zinc-300 border border-zinc-800">
-                  Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-[#0f1015] border border-[#1e2029] space-y-3">
-                <div className="flex items-center gap-2 font-semibold text-zinc-100">
-                  <span className="w-5 h-5 rounded bg-amber-500/10 text-amber-400 flex items-center justify-center font-mono text-xs">2</span>
-                  <span>Cảnh báo Dịch vụ Ngầm SCM</span>
-                </div>
-                <p className="text-zinc-400 leading-relaxed">
-                  Theo dõi sự kiện Windows Event ID 7045 (Dịch vụ mới được cài đặt). Bật cảnh báo tức thì khi phát hiện dịch vụ có Binary Path trỏ ngoài System32 hoặc chứa cờ tham số dị thường như <code className="text-zinc-200 font-mono">-m security</code>.
-                </p>
-                <div className="p-2 rounded bg-black/40 font-mono text-[11px] text-zinc-300 border border-zinc-800">
-                  CommandLine contains "tasksche.exe /i" OR "-m security"
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-[#0f1015] border border-[#1e2029] space-y-3">
-                <div className="flex items-center gap-2 font-semibold text-zinc-100">
-                  <span className="w-5 h-5 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center font-mono text-xs">3</span>
-                  <span>Cảnh báo Lạm dụng LotL (icacls)</span>
-                </div>
-                <p className="text-zinc-400 leading-relaxed">
-                  Giám sát tiến trình con được sinh ra từ thư mục tạm hoặc ProgramData. Khóa quyền thực thi và tạo quy tắc EDR phát hiện chuỗi lệnh <code className="text-zinc-200 font-mono">icacls . /grant Everyone:F</code> và <code className="text-zinc-200 font-mono">attrib +h .</code>.
-                </p>
-                <div className="p-2 rounded bg-black/40 font-mono text-[11px] text-zinc-300 border border-zinc-800">
-                  ProcessName == "icacls.exe" AND CommandLine contains "Everyone:F"
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="iocs" className="scroll-mt-20 space-y-6">
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Chỉ số Nhận diện Nguy cơ</span>
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-400" />
-                <span>08. Chỉ Số IOCs & Ma Trận MITRE ATT&CK Đã Kiểm Chứng</span>
-              </h2>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Bảng thông số định danh duy nhất (IOCs) phục vụ việc điều tra, quét IOC trong mạng và mapping kỹ thuật MITRE.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-              <div className="p-4 rounded-lg bg-[#0f1015] border border-[#1e2029] space-y-2">
-                <span className="text-[11px] text-zinc-500 uppercase tracking-wider block font-sans font-medium">Mã băm Tệp Tin (SHA-256)</span>
-                <div className="space-y-2">
-                  <div>
-                    <div className="text-zinc-400 text-[11px]">Mẫu thực thi gốc:</div>
-                    <div className="p-1.5 rounded bg-black/40 border border-zinc-800 text-[10px] text-zinc-200 break-all select-all">
-                      24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-zinc-400 text-[11px]">Decoy Encrypted (.WNCRY):</div>
-                    <div className="p-1.5 rounded bg-black/40 border border-zinc-800 text-[10px] text-rose-300 break-all select-all">
-                      918F8918E203A7CA3124092C26E0C6F33F920FBEB7A9C67DAFC3705CA6D0D341
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-[#0f1015] border border-[#1e2029] space-y-2">
-                <span className="text-[11px] text-zinc-500 uppercase tracking-wider block font-sans font-medium">Dấu hiệu Tên miền & Đường dẫn</span>
-                <div className="space-y-2">
-                  <div>
-                    <div className="text-zinc-400 text-[11px]">Kill-Switch URL:</div>
-                    <div className="p-1.5 rounded bg-black/40 border border-zinc-800 text-[10px] text-zinc-200 break-all select-all">
-                      http://www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-zinc-400 text-[11px]">Thư mục hoạt động:</div>
-                    <div className="p-1.5 rounded bg-black/40 border border-zinc-800 text-[10px] text-zinc-200 break-all select-all">
-                      C:\ProgramData\evmdthrukdvwcqn063\
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto rounded-lg border border-[#1e2029]">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="bg-zinc-900/80 text-zinc-300 font-mono border-b border-[#1e2029]">
-                    <th className="p-3 font-medium">Tactic</th>
-                    <th className="p-3 font-medium">Technique ID</th>
-                    <th className="p-3 font-medium">Tên Kỹ thuật</th>
-                    <th className="p-3 font-medium">Bằng chứng Xác thực trong Lab</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#1e2029] bg-[#0f1015] text-zinc-400 font-mono text-[11px]">
-                  <tr>
-                    <td className="p-3 text-zinc-300">Execution</td>
-                    <td className="p-3 text-blue-400">T1059.003</td>
-                    <td className="p-3 font-sans text-zinc-200">Windows Command Shell</td>
-                    <td className="p-3">cmd.exe /c "icacls . /grant Everyone:F..." (PID 1152, 3888)</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3 text-zinc-300">Persistence</td>
-                    <td className="p-3 text-blue-400">T1543.003</td>
-                    <td className="p-3 font-sans text-zinc-200">Windows Service Creation</td>
-                    <td className="p-3">mssecsvc2.0 đăng ký SCM (Event ID 7045)</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3 text-zinc-300">Defense Evasion</td>
-                    <td className="p-3 text-blue-400">T1222.001</td>
-                    <td className="p-3 font-sans text-zinc-200">File Permission Modification</td>
-                    <td className="p-3">icacls cấp quyền Everyone:F /T /C /Q (PID 2064)</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3 text-zinc-300">Defense Evasion</td>
-                    <td className="p-3 text-blue-400">T1027</td>
-                    <td className="p-3 font-sans text-zinc-200">Obfuscated Files or Info</td>
-                    <td className="p-3">attrib +h . gán cờ ẩn cho thư mục ProgramData (PID 5808)</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3 text-zinc-300">Impact</td>
-                    <td className="p-3 text-rose-400">T1486</td>
-                    <td className="p-3 font-sans text-zinc-200">Data Encrypted for Impact</td>
-                    <td className="p-3">3 decoy files đổi thành .WNCRY, header WANACRY!</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3 text-zinc-300">Command & Control</td>
-                    <td className="p-3 text-blue-400">T1071.001</td>
-                    <td className="p-3 font-sans text-zinc-200">Web Protocols (HTTP)</td>
-                    <td className="p-3">WinINet GET port 80 (Burp Item #4 HTTP 200 OK)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <footer className="pt-8 border-t border-[#1e2029] text-xs font-mono text-zinc-500 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <span>IAM302 Malware Analysis Lab Report &bull; FPT University FA26</span>
-            </div>
-            <div>
-              <span>Deployed on Vercel &bull; React + Vite + Tailwind CSS</span>
-            </div>
-          </footer>
-
-        </main>
-      </div>
-
-      {glossaryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#0f1015] border border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            
-            <div className="p-4 border-b border-[#1e2029] flex items-center justify-between gap-3 bg-zinc-900/50">
-              <div className="flex items-center gap-2 flex-1">
-                <Search className="w-4 h-4 text-zinc-400 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Tra cứu cơ chế HĐH, lệnh Win32, tham số (VD: SYSTEM, icacls, killswitch)..."
-                  value={glossarySearch}
-                  onChange={(e) => setGlossarySearch(e.target.value)}
-                  className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
-                  autoFocus
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <kbd className="text-[10px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400 border border-zinc-700 hidden sm:inline">ESC để đóng</kbd>
-                <button
-                  onClick={() => setGlossaryOpen(false)}
-                  className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-hidden flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-[#1e2029]">
-              <div className="w-full sm:w-64 overflow-y-auto custom-scrollbar p-2 space-y-1 shrink-0 max-h-48 sm:max-h-none">
-                {filteredGlossary.map(([key, item]) => (
-                  <button
-                    key={key}
-                    onClick={() => setActiveGlossaryTerm(key)}
-                    className={`w-full text-left p-2.5 rounded-lg text-xs transition flex flex-col gap-0.5 ${
-                      activeGlossaryTerm === key
-                        ? 'bg-zinc-800 text-zinc-100 font-medium'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
-                    }`}
-                  >
-                    <span className="truncate">{item.title}</span>
-                    <span className="text-[10px] font-mono text-zinc-500 truncate">{item.cat}</span>
-                  </button>
-                ))}
-                {filteredGlossary.length === 0 && (
-                  <div className="p-4 text-center text-xs text-zinc-500 font-mono">
-                    Không tìm thấy thuật ngữ phù hợp.
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4 text-xs">
-                {glossaryData[activeGlossaryTerm] && (
-                  <>
-                    <div className="space-y-1 border-b border-[#1e2029] pb-3">
-                      <span className="text-[10px] font-mono text-blue-400 uppercase tracking-wider block">
-                        {glossaryData[activeGlossaryTerm].cat}
-                      </span>
-                      <h3 className="text-base font-semibold text-zinc-100">
-                        {glossaryData[activeGlossaryTerm].title}
-                      </h3>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div>
-                        <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block mb-1">
-                          Định Nghĩa
-                        </span>
-                        <p className="text-zinc-300 leading-relaxed">
-                          {glossaryData[activeGlossaryTerm].def}
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block mb-1">
-                          Cơ Chế Hệ Điều Hành Xử Lý
-                        </span>
-                        <p className="text-zinc-300 leading-relaxed bg-black/30 p-3 rounded-lg border border-zinc-800">
-                          {glossaryData[activeGlossaryTerm].mech}
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="text-[11px] font-mono text-rose-400 uppercase tracking-wider block mb-1">
-                          Mục Đích Kẻ Tấn Công Lợi Dụng (Abuse)
-                        </span>
-                        <p className="text-zinc-300 leading-relaxed">
-                          {glossaryData[activeGlossaryTerm].abuse}
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block mb-1">
-                          Khuyến Nghị Phòng Thủ & Nhận Diện
-                        </span>
-                        <p className="text-zinc-300 leading-relaxed">
-                          {glossaryData[activeGlossaryTerm].defense}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
+      <section id="appendix">
+        <SectionTitle number="06" title="Tham khảo & phụ lục">Đi sâu khi cần.</SectionTitle>
+        <details className="reading-level" id="glossary" open={glossaryOpen} onToggle={event=>setGlossaryOpen(event.currentTarget.open)}><summary><span>Tra cứu thuật ngữ</span><span className="summary-hint">Ctrl / ⌘ K</span></summary>
+          <label className="search-label" htmlFor="glossary-search">Tìm khái niệm hoặc tham số</label><input className="search-input" id="glossary-search" type="search" value={glossaryQuery} onChange={event=>setGlossaryQuery(event.target.value)} placeholder="Ví dụ: LocalSystem, DACL, /i" />
+          <dl className="term-list">{terms.map(term=><div key={`${term.findingId}-${term.token}`}><dt>{term.token}</dt><dd>{term.meaning} <a href={`#finding-${term.findingId}`}>Xem trong ngữ cảnh</a></dd></div>)}</dl>{!terms.length&&<p role="status">Không có thuật ngữ phù hợp.</p>}
+        </details>
+        <details className="reading-level"><summary><span>Chín câu hỏi học phần</span><span className="summary-hint">Không mất nội dung chuyên sâu</span></summary><div className="faq-list">{report.appendix.faqs.map(faq=><div key={faq.question}><h3>{faq.question}</h3><p>{faq.answer}</p></div>)}</div></details>
+        <details className="reading-level"><summary><span>IOC & MITRE ATT&CK</span><span className="summary-hint">Liên kết về hành vi</span></summary><p className="fine-print">Chỉ dấu không tự chứng minh một máy bị nhiễm. Mỗi ánh xạ MITRE có lý do và giới hạn trong phần chuyên sâu của hành vi.</p><dl className="term-list">{report.appendix.iocs.map(ioc=><div key={ioc.value}><dt><code>{ioc.value}</code></dt><dd>{ioc.meaning}<p className="fine-print">{ioc.limit}</p><a href={`#finding-${ioc.findingId}`}>Kiểm chứng trong phân tích</a></dd></div>)}</dl><ul className="mitre-index">{report.findings.filter(f=>f.mitre.length).map(f=><li key={f.id}><a href={`#finding-${f.id}`}>{topics[f.id]} · {f.mitre.map(m=>m.id).join(', ')}</a></li>)}</ul></details>
+        <details className="reading-level"><summary><span>Tài liệu tham khảo & nguồn đầy đủ</span><span className="summary-hint">Tách kiến thức khỏi thực nghiệm</span></summary><ul className="reference-list">{report.appendix.references.map(reference=><li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.title} ↗</a></li>)}<li><a href="https://github.com/nimosocute/wannacry-executive-dashboard/blob/main/README.md" target="_blank" rel="noreferrer">README · báo cáo kỹ thuật và danh mục nguồn đầy đủ ↗</a></li></ul><p>R là chỉ số data record 1-based, không tính header. Trích lục công khai kèm hash nguồn gốc và ghi rõ phần đã che thông tin; không thay thế toàn bộ capture.</p></details>
+      </section>
+      <footer className="document-footer"><span>IAM302 · Nguyen Van Bach</span><a href="#overview">Về đầu báo cáo ↑</a></footer>
+    </main></div>
+  </>;
 }

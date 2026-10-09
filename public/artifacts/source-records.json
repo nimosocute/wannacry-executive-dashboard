@@ -1,0 +1,1107 @@
+{
+  "schema_version": 1,
+  "warning": "Selected text excerpts, not full captures. Record indexes are 1-based CSV data records, excluding the header. Hash/header evidence does not prove a cryptographic algorithm.",
+  "redactions": [
+    "Windows user-profile names replaced by [REDACTED_USER].",
+    "Process Start environment blocks replaced by [REDACTED_ENVIRONMENT]; not needed for event attribution, may contain identity/credentials.",
+    "All source columns retained; all other field content unchanged."
+  ],
+  "selection": "All README R-number citations/ranges; explicitly mapped A records, remaining citations belong to B. Union with every src/data/timeline.js source and every R citation in src/data/verifiedProcesses.js (B capture). Three decoys only from four CSVs; header section from existing text audit.",
+  "ui_crosschecks": {
+    "timeline_events": 38,
+    "process_start_events": 15,
+    "checks": "All timeline PID/time and process-start PID/time/operation/parent match selected original rows."
+  },
+  "sources": {
+    "A_200.csv": {
+      "kind": "csv_data_records",
+      "entries": [
+        {
+          "record_index": 343,
+          "fields": {
+            "Time of Day": "11:44:16.9469731 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 2848, Command line: \"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\", Current directory: C:\\LabLive\\Sample_ready\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "4056",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 442,
+          "fields": {
+            "Time of Day": "11:44:17.4650984 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\ProxyBypass",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 1",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 443,
+          "fields": {
+            "Time of Day": "11:44:17.4651596 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\IntranetName",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 1",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 444,
+          "fields": {
+            "Time of Day": "11:44:17.4651827 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\UNCAsIntranet",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 1",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 445,
+          "fields": {
+            "Time of Day": "11:44:17.4655178 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\AutoDetect",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 0",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 447,
+          "fields": {
+            "Time of Day": "11:44:17.5564531 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\ProxyBypass",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 1",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 448,
+          "fields": {
+            "Time of Day": "11:44:17.5565033 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\IntranetName",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 1",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 449,
+          "fields": {
+            "Time of Day": "11:44:17.5565326 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\UNCAsIntranet",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 1",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 450,
+          "fields": {
+            "Time of Day": "11:44:17.5565711 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "RegSetValue",
+            "Path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\AutoDetect",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 0",
+            "TID": "4408",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 461,
+          "fields": {
+            "Time of Day": "11:44:17.7597933 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "TCP Connect",
+            "Path": "127.0.0.1:49754 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, mss: 65495, sackopt: 1, tsopt: 0, wsopt: 1, rcvwin: 262144, rcvwinscale: 8",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 464,
+          "fields": {
+            "Time of Day": "11:44:17.7607834 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "TCP Send",
+            "Path": "127.0.0.1:49754 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 100, startime: 166979, endtime: 166980, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 475,
+          "fields": {
+            "Time of Day": "11:44:17.8177930 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "TCP Receive",
+            "Path": "127.0.0.1:49754 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 155, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 478,
+          "fields": {
+            "Time of Day": "11:44:17.8262714 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "TCP Disconnect",
+            "Path": "127.0.0.1:49754 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 479,
+          "fields": {
+            "Time of Day": "11:44:17.8391858 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "6520",
+            "Operation": "Process Exit",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Exit Status: 0, User Time: 0.0000000 seconds, Kernel Time: 0.1093750 seconds, Private Bytes: 5,513,216, Peak Private Bytes: 5,554,176, Working Set: 11,689,984, Peak Working Set: 11,694,080",
+            "TID": "2952",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        }
+      ]
+    },
+    "B_unreachable.csv": {
+      "kind": "csv_data_records",
+      "entries": [
+        {
+          "record_index": 326,
+          "fields": {
+            "Time of Day": "11:57:33.5614500 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 4872, Command line: \"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\", Current directory: C:\\LabLive\\Sample_ready\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "4256",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 413,
+          "fields": {
+            "Time of Day": "11:57:34.5747453 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49757 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 498,
+          "fields": {
+            "Time of Day": "11:57:35.0749014 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49757 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 679,
+          "fields": {
+            "Time of Day": "11:57:35.5749552 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49757 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 769,
+          "fields": {
+            "Time of Day": "11:57:36.0903993 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49757 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 770,
+          "fields": {
+            "Time of Day": "11:57:36.0904549 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "TCP Disconnect",
+            "Path": "127.0.0.1:49757 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 772,
+          "fields": {
+            "Time of Day": "11:57:36.0995946 AM",
+            "Process Name": "services.exe",
+            "PID": "644",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\System\\CurrentControlSet\\Services\\mssecsvc2.0\\Start",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 2",
+            "TID": "6088",
+            "Image Path": "C:\\Windows\\system32\\services.exe",
+            "Command Line": "C:\\Windows\\system32\\services.exe",
+            "Description": "Services and Controller app"
+          }
+        },
+        {
+          "record_index": 774,
+          "fields": {
+            "Time of Day": "11:57:36.0997076 AM",
+            "Process Name": "services.exe",
+            "PID": "644",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\System\\CurrentControlSet\\Services\\mssecsvc2.0\\ImagePath",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_EXPAND_SZ, Length: 210, Data: C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "TID": "6088",
+            "Image Path": "C:\\Windows\\system32\\services.exe",
+            "Command Line": "C:\\Windows\\system32\\services.exe",
+            "Description": "Services and Controller app"
+          }
+        },
+        {
+          "record_index": 777,
+          "fields": {
+            "Time of Day": "11:57:36.1007151 AM",
+            "Process Name": "services.exe",
+            "PID": "644",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\System\\CurrentControlSet\\Services\\mssecsvc2.0\\ObjectName",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_SZ, Length: 24, Data: LocalSystem",
+            "TID": "6088",
+            "Image Path": "C:\\Windows\\system32\\services.exe",
+            "Command Line": "C:\\Windows\\system32\\services.exe",
+            "Description": "Services and Controller app"
+          }
+        },
+        {
+          "record_index": 780,
+          "fields": {
+            "Time of Day": "11:57:36.1196578 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5272",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 644, Command line: C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security, Current directory: C:\\Windows\\system32\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "6708",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 828,
+          "fields": {
+            "Time of Day": "11:57:36.8874067 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5272",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49758 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1001,
+          "fields": {
+            "Time of Day": "11:57:37.3871963 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5272",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49758 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1083,
+          "fields": {
+            "Time of Day": "11:57:37.9928423 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5272",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49758 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1129,
+          "fields": {
+            "Time of Day": "11:57:38.5846608 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5272",
+            "Operation": "TCP Reconnect",
+            "Path": "127.0.0.1:49758 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1130,
+          "fields": {
+            "Time of Day": "11:57:38.5847171 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5272",
+            "Operation": "TCP Disconnect",
+            "Path": "127.0.0.1:49758 -> 127.0.0.1:80",
+            "Result": "SUCCESS",
+            "Detail": "Length: 0, seqnum: 0, connid: 0",
+            "TID": "0",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe -m security",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1136,
+          "fields": {
+            "Time of Day": "11:57:38.5925187 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "CreateFile",
+            "Path": "C:\\Windows\\tasksche.exe",
+            "Result": "SUCCESS",
+            "Detail": "Desired Access: Generic Write, Read Attributes, Disposition: OverwriteIf, Options: Synchronous IO Non-Alert, Non-Directory File, Attributes: S, ShareMode: None, AllocationSize: 0, OpenResult: Created",
+            "TID": "3456",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1137,
+          "fields": {
+            "Time of Day": "11:57:38.5932685 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "WriteFile",
+            "Path": "C:\\Windows\\tasksche.exe",
+            "Result": "SUCCESS",
+            "Detail": "Offset: 0, Length: 3,514,368, Priority: Normal",
+            "TID": "3456",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1142,
+          "fields": {
+            "Time of Day": "11:57:38.6064230 AM",
+            "Process Name": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "PID": "5152",
+            "Operation": "Process Create",
+            "Path": "C:\\WINDOWS\\tasksche.exe",
+            "Result": "SUCCESS",
+            "Detail": "PID: 6724, Command line: C:\\WINDOWS\\tasksche.exe /i",
+            "TID": "3456",
+            "Image Path": "C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe",
+            "Command Line": "\"C:\\LabLive\\Sample_ready\\24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c.exe\"",
+            "Description": "Microsoft® Disk Defragmenter"
+          }
+        },
+        {
+          "record_index": 1143,
+          "fields": {
+            "Time of Day": "11:57:38.6064300 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "6724",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 5152, Command line: C:\\WINDOWS\\tasksche.exe /i, Current directory: C:\\LabLive\\Sample_ready\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "3456",
+            "Image Path": "C:\\WINDOWS\\tasksche.exe",
+            "Command Line": "C:\\WINDOWS\\tasksche.exe /i",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 1179,
+          "fields": {
+            "Time of Day": "11:57:38.6785954 AM",
+            "Process Name": "services.exe",
+            "PID": "644",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\System\\CurrentControlSet\\Services\\evmdthrukdvwcqn063\\Start",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_DWORD, Length: 4, Data: 2",
+            "TID": "6088",
+            "Image Path": "C:\\Windows\\system32\\services.exe",
+            "Command Line": "C:\\Windows\\system32\\services.exe",
+            "Description": "Services and Controller app"
+          }
+        },
+        {
+          "record_index": 1181,
+          "fields": {
+            "Time of Day": "11:57:38.6787038 AM",
+            "Process Name": "services.exe",
+            "PID": "644",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\System\\CurrentControlSet\\Services\\evmdthrukdvwcqn063\\ImagePath",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_EXPAND_SZ, Length: 120, Data: cmd.exe /c \"C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe\"",
+            "TID": "6088",
+            "Image Path": "C:\\Windows\\system32\\services.exe",
+            "Command Line": "C:\\Windows\\system32\\services.exe",
+            "Description": "Services and Controller app"
+          }
+        },
+        {
+          "record_index": 1184,
+          "fields": {
+            "Time of Day": "11:57:38.6787879 AM",
+            "Process Name": "services.exe",
+            "PID": "644",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\System\\CurrentControlSet\\Services\\evmdthrukdvwcqn063\\ObjectName",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_SZ, Length: 24, Data: LocalSystem",
+            "TID": "6088",
+            "Image Path": "C:\\Windows\\system32\\services.exe",
+            "Command Line": "C:\\Windows\\system32\\services.exe",
+            "Description": "Services and Controller app"
+          }
+        },
+        {
+          "record_index": 1197,
+          "fields": {
+            "Time of Day": "11:57:38.6866410 AM",
+            "Process Name": "cmd.exe",
+            "PID": "1152",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 644, Command line: cmd.exe /c \"C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe\", Current directory: C:\\Windows\\system32\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "6708",
+            "Image Path": "C:\\Windows\\system32\\cmd.exe",
+            "Command Line": "cmd.exe /c \"C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe\"",
+            "Description": "Windows Command Processor"
+          }
+        },
+        {
+          "record_index": 1209,
+          "fields": {
+            "Time of Day": "11:57:38.7258752 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 1152, Command line: C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe, Current directory: C:\\Windows\\system32\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "2828",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 1213,
+          "fields": {
+            "Time of Day": "11:57:38.7612232 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "RegSetValue",
+            "Path": "HKLM\\SOFTWARE\\WOW6432Node\\WanaCrypt0r\\wd",
+            "Result": "SUCCESS",
+            "Detail": "Type: REG_SZ, Length: 68, Data: C:\\ProgramData\\evmdthrukdvwcqn063",
+            "TID": "700",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 1721,
+          "fields": {
+            "Time of Day": "11:57:38.8749271 AM",
+            "Process Name": "attrib.exe",
+            "PID": "5808",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3760, Command line: attrib +h ., Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "700",
+            "Image Path": "C:\\Windows\\SysWOW64\\attrib.exe",
+            "Command Line": "attrib +h .",
+            "Description": "Attribute Utility"
+          }
+        },
+        {
+          "record_index": 1724,
+          "fields": {
+            "Time of Day": "11:57:38.8796359 AM",
+            "Process Name": "icacls.exe",
+            "PID": "2064",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3760, Command line: icacls . /grant Everyone:F /T /C /Q, Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "700",
+            "Image Path": "C:\\Windows\\SysWOW64\\icacls.exe",
+            "Command Line": "icacls . /grant Everyone:F /T /C /Q",
+            "Description": ""
+          }
+        },
+        {
+          "record_index": 1727,
+          "fields": {
+            "Time of Day": "11:57:38.8950558 AM",
+            "Process Name": "Conhost.exe",
+            "PID": "2952",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 5808, Command line: \\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1, Current directory: C:\\Windows, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "3724",
+            "Image Path": "C:\\Windows\\System32\\Conhost.exe",
+            "Command Line": "\\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1",
+            "Description": "Console Window Host"
+          }
+        },
+        {
+          "record_index": 1732,
+          "fields": {
+            "Time of Day": "11:57:38.9162038 AM",
+            "Process Name": "Conhost.exe",
+            "PID": "6992",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 2064, Command line: \\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1, Current directory: C:\\Windows, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "4408",
+            "Image Path": "C:\\Windows\\System32\\Conhost.exe",
+            "Command Line": "\\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1",
+            "Description": "Console Window Host"
+          }
+        },
+        {
+          "record_index": 1844,
+          "fields": {
+            "Time of Day": "11:57:39.2573132 AM",
+            "Process Name": "icacls.exe",
+            "PID": "2064",
+            "Operation": "SetSecurityFile",
+            "Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\b.wnry",
+            "Result": "SUCCESS",
+            "Detail": "Information: DACL",
+            "TID": "4408",
+            "Image Path": "C:\\Windows\\SysWOW64\\icacls.exe",
+            "Command Line": "icacls . /grant Everyone:F /T /C /Q",
+            "Description": ""
+          }
+        },
+        {
+          "record_index": 2263,
+          "fields": {
+            "Time of Day": "11:57:39.7474700 AM",
+            "Process Name": "taskdl.exe",
+            "PID": "6776",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3760, Command line: taskdl.exe, Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "7152",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\taskdl.exe",
+            "Command Line": "taskdl.exe",
+            "Description": "SQL Client Configuration Utility EXE"
+          }
+        },
+        {
+          "record_index": 2279,
+          "fields": {
+            "Time of Day": "11:57:39.9847610 AM",
+            "Process Name": "cmd.exe",
+            "PID": "3888",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3760, Command line: C:\\Windows\\system32\\cmd.exe /c 116221791435459.bat, Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "700",
+            "Image Path": "C:\\Windows\\SysWOW64\\cmd.exe",
+            "Command Line": "C:\\Windows\\system32\\cmd.exe /c 116221791435459.bat",
+            "Description": "Windows Command Processor"
+          }
+        },
+        {
+          "record_index": 2284,
+          "fields": {
+            "Time of Day": "11:57:40.0004317 AM",
+            "Process Name": "Conhost.exe",
+            "PID": "3472",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3888, Command line: \\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1, Current directory: C:\\Windows, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "4212",
+            "Image Path": "C:\\Windows\\System32\\Conhost.exe",
+            "Command Line": "\\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1",
+            "Description": "Console Window Host"
+          }
+        },
+        {
+          "record_index": 2425,
+          "fields": {
+            "Time of Day": "11:57:40.0825587 AM",
+            "Process Name": "cscript.exe",
+            "PID": "6096",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3888, Command line: cscript.exe  //nologo m.vbs, Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "4212",
+            "Image Path": "C:\\Windows\\SysWOW64\\cscript.exe",
+            "Command Line": "cscript.exe  //nologo m.vbs",
+            "Description": "Microsoft ® Console Based Script Host"
+          }
+        },
+        {
+          "record_index": 2617,
+          "fields": {
+            "Time of Day": "11:57:40.1701372 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "SetRenameInformationFile",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\inventory.csv.WNCRYT",
+            "Result": "SUCCESS",
+            "Detail": "ReplaceIfExists: False, FileName: C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\inventory.csv.WNCRY",
+            "TID": "700",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 2638,
+          "fields": {
+            "Time of Day": "11:57:40.1730523 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "SetRenameInformationFile",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\lab_document.rtf.WNCRYT",
+            "Result": "SUCCESS",
+            "Detail": "ReplaceIfExists: False, FileName: C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\lab_document.rtf.WNCRY",
+            "TID": "700",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 2659,
+          "fields": {
+            "Time of Day": "11:57:40.1813166 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "SetRenameInformationFile",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\student_notes.txt.WNCRYT",
+            "Result": "SUCCESS",
+            "Detail": "ReplaceIfExists: False, FileName: C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\student_notes.txt.WNCRY",
+            "TID": "700",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 71993,
+          "fields": {
+            "Time of Day": "11:58:09.8504889 AM",
+            "Process Name": "taskdl.exe",
+            "PID": "3252",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3760, Command line: taskdl.exe, Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "7152",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\taskdl.exe",
+            "Command Line": "taskdl.exe",
+            "Description": "SQL Client Configuration Utility EXE"
+          }
+        },
+        {
+          "record_index": 272246,
+          "fields": {
+            "Time of Day": "11:58:39.9493027 AM",
+            "Process Name": "taskdl.exe",
+            "PID": "1532",
+            "Operation": "Process Start",
+            "Path": "",
+            "Result": "SUCCESS",
+            "Detail": "Parent PID: 3760, Command line: taskdl.exe, Current directory: C:\\ProgramData\\evmdthrukdvwcqn063\\, Environment: [REDACTED_ENVIRONMENT]",
+            "TID": "7152",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\taskdl.exe",
+            "Command Line": "taskdl.exe",
+            "Description": "SQL Client Configuration Utility EXE"
+          }
+        },
+        {
+          "record_index": 279026,
+          "fields": {
+            "Time of Day": "11:58:40.9514099 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "SetRenameInformationFile",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\inventory.csv",
+            "Result": "SUCCESS",
+            "Detail": "ReplaceIfExists: True, FileName: C:\\Windows\\Temp\\5.WNCRYT",
+            "TID": "6256",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 279034,
+          "fields": {
+            "Time of Day": "11:58:40.9523913 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "SetRenameInformationFile",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\lab_document.rtf",
+            "Result": "SUCCESS",
+            "Detail": "ReplaceIfExists: True, FileName: C:\\Windows\\Temp\\6.WNCRYT",
+            "TID": "6256",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        },
+        {
+          "record_index": 279042,
+          "fields": {
+            "Time of Day": "11:58:40.9531109 AM",
+            "Process Name": "tasksche.exe",
+            "PID": "3760",
+            "Operation": "SetRenameInformationFile",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\student_notes.txt",
+            "Result": "SUCCESS",
+            "Detail": "ReplaceIfExists: True, FileName: C:\\Windows\\Temp\\7.WNCRYT",
+            "TID": "6256",
+            "Image Path": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Command Line": "C:\\ProgramData\\evmdthrukdvwcqn063\\tasksche.exe",
+            "Description": "DiskPart"
+          }
+        }
+      ]
+    },
+    "decoys_before.csv": {
+      "kind": "csv_data_records",
+      "entries": [
+        {
+          "record_index": 1,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "B540FE2588CBAC784D685611B4E62FBF3DABDC03E5DEC0402A2C634756DF8EC4",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\inventory.csv"
+          }
+        },
+        {
+          "record_index": 2,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "C369AE736604EC60D7307134197A251CDD6472EEB15720E6EE5DF56ABBD01E13",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\lab_document.rtf"
+          }
+        },
+        {
+          "record_index": 3,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "0F855BDB7C9C9E29BA4BAC8E446C5190C8D1FF90784376AEECA759F5CCE1FBB1",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\student_notes.txt"
+          }
+        }
+      ]
+    },
+    "decoys_A_200.csv": {
+      "kind": "csv_data_records",
+      "entries": [
+        {
+          "record_index": 1,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "B540FE2588CBAC784D685611B4E62FBF3DABDC03E5DEC0402A2C634756DF8EC4",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\inventory.csv"
+          }
+        },
+        {
+          "record_index": 2,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "C369AE736604EC60D7307134197A251CDD6472EEB15720E6EE5DF56ABBD01E13",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\lab_document.rtf"
+          }
+        },
+        {
+          "record_index": 3,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "0F855BDB7C9C9E29BA4BAC8E446C5190C8D1FF90784376AEECA759F5CCE1FBB1",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\student_notes.txt"
+          }
+        }
+      ]
+    },
+    "decoys_after_hashes.csv": {
+      "kind": "csv_data_records",
+      "entries": [
+        {
+          "record_index": 3,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "918F8918E203A7CA3124092C26E0C6F33F920FBEB7A9C67DAFC3705CA6D0D341",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\inventory.csv.WNCRY"
+          }
+        },
+        {
+          "record_index": 4,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "8F75DB912721C122753D48B06FE56F7A438BBBE8CCB5AA7BA61D4978449A99A8",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\lab_document.rtf.WNCRY"
+          }
+        },
+        {
+          "record_index": 5,
+          "fields": {
+            "Algorithm": "SHA256",
+            "Hash": "D6BB94CD8914974A5D41404819E387297DE7CFD0B31E4230D311BA7DFC4FFE95",
+            "Path": "C:\\Users\\[REDACTED_USER]\\Documents\\IAM302_Decoys_20261008\\student_notes.txt.WNCRY"
+          }
+        }
+      ]
+    },
+    "decoys_after_files.csv": {
+      "kind": "csv_data_records",
+      "entries": [
+        {
+          "record_index": 3,
+          "fields": {
+            "Name": "inventory.csv.WNCRY",
+            "Length": "328",
+            "CreationTime": "10/8/2026 11:28:34 AM",
+            "LastWriteTime": "10/8/2026 11:28:34 AM"
+          }
+        },
+        {
+          "record_index": 4,
+          "fields": {
+            "Name": "lab_document.rtf.WNCRY",
+            "Length": "360",
+            "CreationTime": "10/8/2026 11:28:34 AM",
+            "LastWriteTime": "10/8/2026 11:28:34 AM"
+          }
+        },
+        {
+          "record_index": 5,
+          "fields": {
+            "Name": "student_notes.txt.WNCRY",
+            "Length": "360",
+            "CreationTime": "10/8/2026 11:28:34 AM",
+            "LastWriteTime": "10/8/2026 11:28:34 AM"
+          }
+        }
+      ]
+    },
+    "handles_modules_decoys_verified.md": {
+      "kind": "text_lines_from_existing_audit_not_new_binary_inspection",
+      "entries": [
+        {
+          "line_number": 186,
+          "text": "### Encrypted File Header Inspection (`.WNCRY`)"
+        },
+        {
+          "line_number": 187,
+          "text": ""
+        },
+        {
+          "line_number": 188,
+          "text": "| Encrypted File | Length | Magic Bytes 0..7 (ASCII) | Magic Bytes 0..7 (Hex) | Bytes 8..11 (Hex / uint32 LE) | First 16 Bytes Hex String |"
+        },
+        {
+          "line_number": 189,
+          "text": "| :--- | :--- | :--- | :--- | :--- | :--- |"
+        },
+        {
+          "line_number": 190,
+          "text": "| `inventory.csv.WNCRY` | 328 bytes | `WANACRY!` | `57 41 4E 41 43 52 59 21` | `00 01 00 00` (256 decimal) | `57-41-4E-41-43-52-59-21-00-01-00-00-8E-69-D6-CA` |"
+        },
+        {
+          "line_number": 191,
+          "text": "| `lab_document.rtf.WNCRY` | 360 bytes | `WANACRY!` | `57 41 4E 41 43 52 59 21` | `00 01 00 00` (256 decimal) | `57-41-4E-41-43-52-59-21-00-01-00-00-F8-DE-9D-9D` |"
+        },
+        {
+          "line_number": 192,
+          "text": "| `student_notes.txt.WNCRY` | 360 bytes | `WANACRY!` | `57 41 4E 41 43 52 59 21` | `00 01 00 00` (256 decimal) | `57-41-4E-41-43-52-59-21-00-01-00-00-F5-49-BF-61` |"
+        },
+        {
+          "line_number": 193,
+          "text": ""
+        },
+        {
+          "line_number": 194,
+          "text": "#### Header Evidence Boundary"
+        },
+        {
+          "line_number": 195,
+          "text": "- **Observed Structure:**"
+        },
+        {
+          "line_number": 196,
+          "text": "  1. Bytes 0–7: ASCII magic constant `WANACRY!` (`57 41 4E 41 43 52 59 21`)."
+        },
+        {
+          "line_number": 197,
+          "text": "  2. Bytes 8–11: Observed 4-byte little-endian unsigned integer value 256 (`0x00000100`) at offset 8..11; observed value at an offset, not proven block size/key length without format validation."
+        },
+        {
+          "line_number": 198,
+          "text": "  3. Bytes 12–267: 256-byte payload block."
+        },
+        {
+          "line_number": 199,
+          "text": "- **Critical Algorithm Boundary:** Bytes 8..11 uint32=256 is an observed value at an offset, not proven block size or key length without format validation. It does NOT prove RSA-2048, AES, or specific key parsing/API use without static/dynamic cryptographic routine validation."
+        },
+        {
+          "line_number": 200,
+          "text": ""
+        }
+      ]
+    }
+  }
+}
